@@ -1,13 +1,14 @@
-package com.creaginetech.expresshoes;
+package com.creaginetech.expresshoes.Fragment;
 
 import android.content.DialogInterface;
-import android.provider.ContactsContract;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Model.Order;
 import com.creaginetech.expresshoes.Model.Request;
+import com.creaginetech.expresshoes.R;
 import com.creaginetech.expresshoes.ViewHolder.CartAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -27,9 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import info.hoang8f.widget.FButton;
-
-public class CartActivity extends AppCompatActivity {
+public class CartFragment extends Fragment {
 
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -44,42 +44,55 @@ public class CartActivity extends AppCompatActivity {
 
     CartAdapter adapter;
 
+    public CartFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_cart, container, false);
 
         //Firebase
         database = FirebaseDatabase.getInstance();
         requests=database.getReference("Requests");
 
         //Init
-        recyclerView = (RecyclerView)findViewById(R.id.listCart);
+        recyclerView = (RecyclerView)view.findViewById(R.id.listCart);
         recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        
-        txtTotalPrice = (TextView)findViewById(R.id.total);
-        btnPlace = (Button)findViewById(R.id.btnPlaceOrder);
+
+        txtTotalPrice = (TextView)view.findViewById(R.id.total);
+        btnPlace = (Button)view.findViewById(R.id.btnPlaceOrder);
 
         btnPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+
                 showAlertDialog();
 
             }
         });
 
         loadListFood();
+
+        return view;
+
     }
 
     private void showAlertDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(CartActivity.this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setTitle("One more step!");
         alertDialog.setMessage("Enter your address: ");
 
-        final EditText edtAddress = new EditText(CartActivity.this);
+        final EditText edtAddress = new EditText(getActivity());
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
@@ -105,8 +118,8 @@ public class CartActivity extends AppCompatActivity {
                 requests.child(String.valueOf(System.currentTimeMillis()))
                         .setValue(request);
                 //Delete Cart
-                new Database(getBaseContext()).cleanCart();
-                Toast.makeText(CartActivity.this, "Thank you , Order Place", Toast.LENGTH_SHORT).show();
+                new Database(getActivity().getBaseContext()).cleanCart();
+                Toast.makeText(getActivity(), "Thank you , Order Place", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -121,8 +134,8 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void loadListFood() {
-        cart = new Database(this).getCarts();
-        adapter = new CartAdapter(cart,this);
+        cart = new Database(getActivity()).getCarts();
+        adapter = new CartAdapter(cart,getActivity());
         recyclerView.setAdapter(adapter);
 
         //Calculate total price
@@ -134,4 +147,5 @@ public class CartActivity extends AppCompatActivity {
 
         txtTotalPrice.setText(fmt.format(total));
     }
+
 }

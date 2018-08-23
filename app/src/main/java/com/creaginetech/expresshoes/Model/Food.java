@@ -2,17 +2,20 @@ package com.creaginetech.expresshoes.Model;
 
 public class Food {
     private String name1, image, description, price, discount, menuId;
+    private int number;
 
     public Food() {
     }
 
-    public Food(String name1, String image, String description, String price, String discount, String menuId) {
+    public Food(String name1, String image, String description, String price, String discount,
+                String menuId, int number) {
         this.name1 = name1;
         this.image = image;
         this.description = description;
         this.price = price;
         this.discount = discount;
         this.menuId = menuId;
+        this.number = number;
     }
 
     public String getName1() {
@@ -61,5 +64,13 @@ public class Food {
 
     public void setMenuId(String menuId) {
         this.menuId = menuId;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 }

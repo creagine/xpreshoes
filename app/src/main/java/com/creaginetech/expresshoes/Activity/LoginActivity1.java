@@ -1,4 +1,4 @@
-package com.creaginetech.expresshoes;
+package com.creaginetech.expresshoes.Activity;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.creaginetech.expresshoes.R;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -23,7 +24,7 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity1 extends AppCompatActivity {
 
 
     CallbackManager callbackManager;
@@ -31,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login1);
         callbackManager = CallbackManager.Factory.create();
         this.setTitle("Login");
         LoginButton loginButton = (LoginButton)findViewById(R.id.login_button);

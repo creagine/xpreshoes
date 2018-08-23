@@ -1,14 +1,14 @@
-package com.creaginetech.expresshoes;
+package com.creaginetech.expresshoes.Activity;
 
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Model.User;
+import com.creaginetech.expresshoes.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,7 +20,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     MaterialEditText edtPhone,edtName,edtPassword;
     Button btnSignUp;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

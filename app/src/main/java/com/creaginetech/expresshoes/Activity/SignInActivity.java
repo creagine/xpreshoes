@@ -1,4 +1,4 @@
-package com.creaginetech.expresshoes;
+package com.creaginetech.expresshoes.Activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -11,18 +11,17 @@ import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Model.User;
+import com.creaginetech.expresshoes.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
-
-import java.security.Signature;
 
 public class SignInActivity extends AppCompatActivity {
 
+    //deklarasi variabel
     EditText edtPhone,edtPassword;
     Button btnSignIn;
 
@@ -31,6 +30,7 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        //inisialisasi variabel
         edtPhone = (MaterialEditText)findViewById(R.id.edtPhone);
         edtPassword = (MaterialEditText)findViewById(R.id.edtPassword);
         btnSignIn = (Button)findViewById(R.id.btnSignIn);
@@ -39,17 +39,18 @@ public class SignInActivity extends AppCompatActivity {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference table_user = database.getReference("User");
 
+        //onclick button sign in
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                //progress dialog please wait
                 final ProgressDialog mDialog = new ProgressDialog(SignInActivity.this);
                 mDialog.setMessage("Please waiting....");
                 mDialog.show();
 
+                //ambil data dari firebase database "user"
                 table_user.addValueEventListener(new ValueEventListener() {
-
-
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 

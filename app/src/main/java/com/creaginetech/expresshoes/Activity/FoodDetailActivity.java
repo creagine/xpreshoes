@@ -1,6 +1,5 @@
-package com.creaginetech.expresshoes;
+package com.creaginetech.expresshoes.Activity;
 
-import android.media.Image;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +13,7 @@ import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Model.Food;
 import com.creaginetech.expresshoes.Model.Order;
+import com.creaginetech.expresshoes.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso;
 
 public class FoodDetailActivity extends AppCompatActivity {
 
+    //deklarasi variabel
     TextView food_name,food_price,food_description;
     ImageView food_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
@@ -31,8 +32,9 @@ public class FoodDetailActivity extends AppCompatActivity {
 
     String foodId="";
 
-    FirebaseDatabase database;
-    DatabaseReference foods;
+    //vsrisbel firebase
+    FirebaseDatabase mDatabaseInstance;
+    DatabaseReference mFirebaseDatabase;
 
     Food currentFood;
 
@@ -42,13 +44,14 @@ public class FoodDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_food_detail);
 
         //Firebase
-        database = FirebaseDatabase.getInstance();
-        foods = database.getReference("Foods");
+        mDatabaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = mDatabaseInstance.getReference("Foods");
 
         //Init View
         numberButton = (ElegantNumberButton)findViewById(R.id.number_button);
         btnCart = (FloatingActionButton)findViewById(R.id.btnCart);
 
+        //onclick button cart
         btnCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,20 +61,21 @@ public class FoodDetailActivity extends AppCompatActivity {
                         numberButton.getNumber(),
                         currentFood.getPrice(),
                         currentFood.getDiscount()
-
-
-
                 ));
 
                 Toast.makeText(FoodDetailActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
+
             }
         });
 
+
+        //inisialisasi variabel to view
         food_description = (TextView)findViewById(R.id.food_description);
         food_name = (TextView)findViewById(R.id.food_name);
         food_price = (TextView)findViewById(R.id.food_price);
         food_image = (ImageView)findViewById(R.id.img_food);
 
+        //collapsing toolbar
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
@@ -85,8 +89,9 @@ public class FoodDetailActivity extends AppCompatActivity {
         }
     }
 
+    //ambil info detail food
     private void getDetailFood(String foodId) {
-        foods.child(foodId).addValueEventListener(new ValueEventListener() {
+        mFirebaseDatabase.child(foodId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 currentFood = dataSnapshot.getValue(Food.class);

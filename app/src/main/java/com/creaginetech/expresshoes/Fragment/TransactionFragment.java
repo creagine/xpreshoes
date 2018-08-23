@@ -1,19 +1,24 @@
-package com.creaginetech.expresshoes;
+package com.creaginetech.expresshoes.Fragment;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Model.Request;
+import com.creaginetech.expresshoes.R;
 import com.creaginetech.expresshoes.ViewHolder.OrderViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class OrderStatusActivity extends AppCompatActivity {
-
+public class TransactionFragment extends Fragment {
 
     public RecyclerView recyclerView;
     public RecyclerView.LayoutManager layoutManager;
@@ -23,23 +28,33 @@ public class OrderStatusActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference requests;
 
+    public TransactionFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order_status);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_transaction, container, false);
 
         //Firebase
         database = FirebaseDatabase.getInstance();
         requests = database.getReference("Requests");
 
-        recyclerView = (RecyclerView)findViewById(R.id.listOrders);
+        recyclerView = (RecyclerView)view.findViewById(R.id.listOrders);
         recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
         loadOrder(Common.currentUser.getPhone());
 
-
+        return view;
     }
 
     private void loadOrder(String phone) {
@@ -48,7 +63,7 @@ public class OrderStatusActivity extends AppCompatActivity {
                 R.layout.order_layout,
                 OrderViewHolder.class,
                 requests.orderByChild("phone")
-                .equalTo(phone)
+                        .equalTo(phone)
         ) {
             @Override
             protected void populateViewHolder(OrderViewHolder viewHolder, Request model, int position) {
@@ -71,4 +86,5 @@ public class OrderStatusActivity extends AppCompatActivity {
         else
             return "Shipped";
     }
+
 }
