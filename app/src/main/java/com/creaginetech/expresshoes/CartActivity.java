@@ -56,7 +56,7 @@ public class CartActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference requests;
 
-    TextView txtTotalPrice;
+    public TextView txtTotalPrice; //public agar bisa dipanggil di cartAdapter
     Button btnPlace;
 
     List<Order> cart = new ArrayList<>();

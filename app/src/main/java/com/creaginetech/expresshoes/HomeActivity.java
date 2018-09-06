@@ -24,10 +24,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.andremion.counterfab.CounterFab;
 import com.creaginetech.expresshoes.Common.Common;
+import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Category;
 import com.creaginetech.expresshoes.Model.Token;
@@ -66,6 +70,8 @@ public class HomeActivity extends AppCompatActivity
     FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
 
     SwipeRefreshLayout swipeRefreshLayout;
+
+    CounterFab fab;
 
     boolean doubleBackToExitPressedOnce = false;
 
@@ -130,22 +136,21 @@ public class HomeActivity extends AppCompatActivity
         database = FirebaseDatabase.getInstance();
         category = database.getReference("Category");
 
-
         Paper.init(this);
 
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //Cart FAB
+        fab = (CounterFab) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 //Button add Cart
                 Intent cartIntent = new Intent(HomeActivity.this,CartActivity.class);
                 startActivity(cartIntent);
-
             }
         });
+        //count cart
+        fab.setCount(new Database(this).getCountCart());
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -164,11 +169,8 @@ public class HomeActivity extends AppCompatActivity
 
         //Load menu
         recycler_menu = (RecyclerView)findViewById(R.id.recycler_menu);
-        recycler_menu.setHasFixedSize(true);
-        //layoutManager = new LinearLayoutManager(this);
-        //recycler_menu.setLayoutManager(layoutManager);
-        recycler_menu.setLayoutManager(new GridLayoutManager(this,2)); //grid layout halaman home
 
+        recycler_menu.setLayoutManager(new GridLayoutManager(this,2)); //grid layout halaman home
 
 
         //to add your token when login app
@@ -216,9 +218,12 @@ public class HomeActivity extends AppCompatActivity
                 return new MenuViewHolder(itemView);
             }
         };
+
+
         adapter.startListening();
         recycler_menu.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
+
     }
 
     @Override
@@ -231,7 +236,10 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        loadMenu();
+        fab.setCount(new Database(this).getCountCart());
+        //show category when click back button from food
+        if (adapter != null)
+            adapter.startListening();
     }
 
     @Override

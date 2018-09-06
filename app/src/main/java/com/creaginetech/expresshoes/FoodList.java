@@ -20,6 +20,7 @@ import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Food;
+import com.creaginetech.expresshoes.Model.Order;
 import com.creaginetech.expresshoes.ViewHolder.FoodViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -271,6 +272,25 @@ public class FoodList extends AppCompatActivity {
                 Picasso.with(getBaseContext()).load(model.getImage())
                         .into(viewHolder.food_image);
 
+                //Add Quck Cart
+                viewHolder.quick_cart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Database(getBaseContext()).addToCart(new Order(
+                                //copy from foodDetail
+                                adapter.getRef(position).getKey(),
+                                model.getName1(),
+                                "1",
+                                model.getPrice(),
+                                model.getDiscount()
+
+                        ));
+
+                        Toast.makeText(FoodList.this, "Added to Cart", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
                 //Add favorites
                 if (localDB.isFavorites(adapter.getRef(position).getKey()))
                     viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -329,6 +349,8 @@ public class FoodList extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadListFood(categoryId);
+        //show item in food list when click back from food detail
+        if (adapter != null)
+            adapter.startListening();
     }
 }
