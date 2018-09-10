@@ -37,6 +37,7 @@ dependencies {
     implementation 'com.android.support:design:27.0.2'
 
     //Add Library
+    implementation 'com.google.android.gms:play-services-places:11.6.2'//Google service
     implementation 'com.github.andremion:counterfab:1.0.1' //counterFAB
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0' //to apply font for all views in project
     implementation 'com.google.firebase:firebase-messaging:11.6.2' //firebase messaging

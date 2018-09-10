@@ -28,6 +28,10 @@ import com.creaginetech.expresshoes.Model.Sender;
 import com.creaginetech.expresshoes.Model.Token;
 import com.creaginetech.expresshoes.Remote.APIService;
 import com.creaginetech.expresshoes.ViewHolder.CartAdapter;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,6 +69,7 @@ public class CartActivity extends AppCompatActivity {
 
     APIService mService;
 
+    Place shippingAddres;
 
     //calligraphy
     @Override
@@ -124,7 +129,31 @@ public class CartActivity extends AppCompatActivity {
         LayoutInflater inflater = this.getLayoutInflater();
         View order_address_comment = inflater.inflate(R.layout.order_address_comment,null);
 
-        final MaterialEditText edtAddress = (MaterialEditText)order_address_comment.findViewById(R.id.edtAddress);
+//        final MaterialEditText edtAddress = (MaterialEditText)order_address_comment.findViewById(R.id.edtAddress);
+        PlaceAutocompleteFragment edtAddress = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        //Hide search icon before fragment
+        edtAddress.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
+        //set hint for autocomplete edit text
+        ((EditText)edtAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                .setHint("Enter your address");
+        //set text size
+        ((EditText)edtAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                .setTextSize(14);
+
+        //Get Address from place autocomplete
+        edtAddress.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                shippingAddres=place;
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.e("ERROR",status.getStatusMessage());
+
+            }
+        });
+
         final MaterialEditText edtComment = (MaterialEditText)order_address_comment.findViewById(R.id.edtComment);
 
         alertDialog.setView(order_address_comment);
@@ -137,10 +166,11 @@ public class CartActivity extends AppCompatActivity {
                 Request request = new Request(
                         Common.currentUser.getPhone(),
                         Common.currentUser.getName(),
-                        edtAddress.getText().toString(),
+                        shippingAddres.getAddress().toString(),
                         txtTotalPrice.getText().toString(),
                         "0", // status
                         edtComment.getText().toString(),
+                        String.format("%s,%s",shippingAddres.getLatLng().latitude,shippingAddres.getLatLng().longitude),
                         cart
                 );
 
@@ -155,8 +185,12 @@ public class CartActivity extends AppCompatActivity {
                 sendNotificationOrder(order_number);
 
 
-//                Toast.makeText(CartActivity.this, "Thank you , Order Place", Toast.LENGTH_SHORT).show();
-//                finish();
+                //Remove fragment agar tidak crash saat order lagi
+                getFragmentManager().beginTransaction()
+                        .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
+                        .commit();
+
+
             }
         });
 
@@ -164,6 +198,13 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
+
+                //Remove fragment agar tidak crash saat order lagi
+                getFragmentManager().beginTransaction()
+                        .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
+                        .commit();
+
+
             }
         });
 
