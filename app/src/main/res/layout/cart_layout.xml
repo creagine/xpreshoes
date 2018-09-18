@@ -7,15 +7,18 @@
     android:layout_margin="8dp"
     app:cardElevation="4dp"
     >
-    
-    
+
     <LinearLayout
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_margin="8dp"
         android:orientation="horizontal"
         android:layout_gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/cart_image"
+            android:layout_width="70dp"
+            android:layout_height="70dp" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -43,7 +46,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-
         </LinearLayout>
 
         <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
@@ -52,7 +54,7 @@
             android:layout_height="30dp"
             android:layout_margin="10dp"
             app:textSize="8sp"
-            app:backGroundColor="@color/colorAccent"
+            app:backGroundColor="@color/btnSignActive"
             app:initialNumber="1"
             app:finalNumber="20"
             />

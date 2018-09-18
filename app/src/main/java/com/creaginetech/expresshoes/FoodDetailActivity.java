@@ -100,7 +100,8 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                         currentFood.getName1(),
                         numberButton.getNumber(),
                         currentFood.getPrice(),
-                        currentFood.getDiscount()
+                        currentFood.getDiscount(),
+                        currentFood.getImage()
 
 
 
