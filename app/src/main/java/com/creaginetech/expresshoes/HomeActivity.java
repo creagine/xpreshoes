@@ -33,16 +33,24 @@ import com.andremion.counterfab.CounterFab;
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
+import com.creaginetech.expresshoes.Model.Banner;
 import com.creaginetech.expresshoes.Model.Category;
 import com.creaginetech.expresshoes.Model.Token;
 import com.creaginetech.expresshoes.ViewHolder.MenuViewHolder;
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
@@ -72,6 +80,11 @@ public class HomeActivity extends AppCompatActivity
     SwipeRefreshLayout swipeRefreshLayout;
 
     CounterFab fab;
+
+    //Slider
+    HashMap<String,String> image_list;
+    SliderLayout mSlider;
+
 
     boolean doubleBackToExitPressedOnce = false;
 
@@ -177,6 +190,72 @@ public class HomeActivity extends AppCompatActivity
         updateToken(FirebaseInstanceId.getInstance().getToken());
 
 
+        //Setup Slider
+        //need call this function after you init database firebase
+        setupSlider();
+
+    }
+
+    private void setupSlider() {
+        mSlider = (SliderLayout)findViewById(R.id.slider);
+        image_list = new HashMap<>();
+
+        final DatabaseReference banners = database.getReference("Banner");
+
+        banners.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapShot:dataSnapshot.getChildren())
+                {
+                    Banner banner = postSnapShot.getValue(Banner.class);
+                    // we will concat string name and id like
+                    // PIZZA_01 -> and we will use PIZZA for show description, 01 for food id to click
+                    image_list.put(banner.getName()+"@@@"+banner.getId(),banner.getImage());
+                }
+                for (String key:image_list.keySet())
+                {
+                    String[] keySplit = key.split("@@@");
+                    String nameOfFood = keySplit[0];
+                    String idOfFood = keySplit[1];
+
+                    //Create Slider
+                    final TextSliderView textSliderView = new TextSliderView(getBaseContext());
+                    textSliderView
+                            .description(nameOfFood)
+                            .image(image_list.get(key))
+                            .setScaleType(BaseSliderView.ScaleType.Fit)
+                            .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                                @Override
+                                public void onSliderClick(BaseSliderView slider) {
+                                    Intent intent = new Intent(HomeActivity.this,FoodDetailActivity.class);
+                                    //we will send food id to foodDetail
+                                    intent.putExtras(textSliderView.getBundle());
+                                    startActivity(intent);
+                                }
+                            });
+                    //Add extra bundle
+                    textSliderView.bundle(new Bundle());
+                    textSliderView.getBundle().putString("FoodId",idOfFood);
+
+                    mSlider.addSlider(textSliderView);
+
+                    //Remove event after finish
+                    banners.removeEventListener(this);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        mSlider.setPresetTransformer(SliderLayout.Transformer.Accordion);
+        mSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        mSlider.setCustomAnimation(new DescriptionAnimation());
+        mSlider.setDuration(4000);
+
     }
 
     private void updateToken(String token) {
@@ -230,7 +309,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         adapter.stopListening();
-
+        mSlider.stopAutoCycle();
     }
 
     @Override
