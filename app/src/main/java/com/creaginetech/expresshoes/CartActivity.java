@@ -14,13 +14,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +78,8 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public TextView txtTotalPrice; //public agar bisa dipanggil di cartAdapter
     Button btnPlace;
+
+    String address;
 
     List<Order> cart = new ArrayList<>();
 
@@ -211,7 +216,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         View order_address_comment = inflater.inflate(R.layout.order_address_comment,null);
 
 //        final MaterialEditText edtAddress = (MaterialEditText)order_address_comment.findViewById(R.id.edtAddress);
-        PlaceAutocompleteFragment edtAddress = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        final PlaceAutocompleteFragment edtAddress = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         //Hide search icon before fragment
         edtAddress.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
         //set hint for autocomplete edit text
@@ -236,6 +241,31 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
         final MaterialEditText edtComment = (MaterialEditText)order_address_comment.findViewById(R.id.edtComment);
+
+        //Radio
+        final RadioButton radioHomeAddress = (RadioButton) order_address_comment.findViewById(R.id.radioHomeAddress);
+
+        //Event Radio
+        radioHomeAddress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                {
+                   if (Common.currentUser.getHomeAddress() != null ||
+                           !TextUtils.isEmpty(Common.currentUser.getHomeAddress()))
+                   {
+                       address = Common.currentUser.getHomeAddress();
+                       ((EditText) edtAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                               .setText(address);
+                   }
+                   else
+                   {
+                       Toast.makeText(CartActivity.this, "Please update your Home Address", Toast.LENGTH_SHORT).show();
+                   }
+                }
+
+            }
+        });
 
         alertDialog.setView(order_address_comment);
         alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
@@ -264,6 +294,9 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 new Database(getBaseContext()).cleanCart();
 
                 sendNotificationOrder(order_number);
+
+//                Toast.makeText(CartActivity.this, "Thank you , Order Place", Toast.LENGTH_SHORT).show();
+//                finish();
 
 
                 //Remove fragment agar tidak crash saat order lagi
