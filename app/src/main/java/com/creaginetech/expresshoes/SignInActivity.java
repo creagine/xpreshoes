@@ -42,22 +42,9 @@ public class  SignInActivity extends AppCompatActivity {
     DatabaseReference table_user;
 
 
-    //calligraphy
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Note: add this code before setContentView method
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/cf.otf")
-                .setFontAttrId(R.attr.fontPath)
-                .build());
-
         setContentView(R.layout.activity_sign_in);
 
         edtPhone = (MaterialEditText)findViewById(R.id.edtPhone);

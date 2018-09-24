@@ -129,6 +129,63 @@ public class FoodList extends AppCompatActivity {
                         return;
                     }
                 }
+
+                //Because search function need category so we need paste code here
+                //after getIntent categoryId
+                //Search
+                materialSearchBar = (MaterialSearchBar)findViewById(R.id.searchBar);
+                materialSearchBar.setHint("Enter your food");
+                loadSuggest(); // Write function to load suggest from firebase
+
+                materialSearchBar.setCardViewElevation(10);
+                materialSearchBar.addTextChangeListener(new TextWatcher()  {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //When user type their text, we will change suggest list
+
+                        List<String> suggest = new ArrayList<String>();
+                        for (String search:suggestList) // loop in suggest list
+                        {
+                            if (search.toLowerCase().contains(materialSearchBar.getText().toLowerCase()))
+                                suggest.add(search);
+                        }
+                        materialSearchBar.setLastSuggestions(suggest);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+                materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+                    @Override
+                    public void onSearchStateChanged(boolean enabled) {
+                        //When Search Bar is close
+                        //Restore original adapter
+                        if (!enabled)
+                            recyclerView.setAdapter(adapter);
+                    }
+
+                    @Override
+                    public void onSearchConfirmed(CharSequence text) {
+                        //WHen search finish
+                        //Show result of search adapter
+
+                        startSearch(text);
+
+
+                    }
+
+                    @Override
+                    public void onButtonClicked(int buttonCode) {
+
+                    }
+                });
             }
         });
 
@@ -138,62 +195,7 @@ public class FoodList extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
 
-        //Search
-        materialSearchBar = (MaterialSearchBar)findViewById(R.id.searchBar);
-        materialSearchBar.setHint("Enter your food");
-        
-        loadSuggest(); // Write function to load suggest from firebase
 
-        materialSearchBar.setLastSuggestions(suggestList);
-        materialSearchBar.setCardViewElevation(10);
-        materialSearchBar.addTextChangeListener(new TextWatcher()  {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //When user type their text, we will change suggest list
-
-                List<String> suggest = new ArrayList<String>();
-                for (String search:suggestList) // loop in suggest list
-                {
-                    if (search.toLowerCase().contains(materialSearchBar.getText().toLowerCase()))
-                        suggest.add(search);
-                }
-                materialSearchBar.setLastSuggestions(suggest);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-        materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
-            @Override
-            public void onSearchStateChanged(boolean enabled) {
-                //When Search Bar is close
-                //Restore original adapter
-                if (!enabled)
-                    recyclerView.setAdapter(adapter);
-            }
-
-            @Override
-            public void onSearchConfirmed(CharSequence text) {
-                //WHen search finish
-                //Show result of search adapter
-
-                startSearch(text);
-
-
-            }
-
-            @Override
-            public void onButtonClicked(int buttonCode) {
-
-            }
-        });
 
     }
 
@@ -246,6 +248,7 @@ public class FoodList extends AppCompatActivity {
                             suggestList.add(item.getName1()); // Add name of food to suggest list
                         }
 
+                        materialSearchBar.setLastSuggestions(suggestList);
                     }
 
                     @Override
