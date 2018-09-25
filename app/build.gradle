@@ -10,6 +10,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
         
     }
     buildTypes {
@@ -37,6 +38,10 @@ dependencies {
     implementation 'com.android.support:design:27.0.2'
 
     //Add Library
+
+    //Facebook Account Kit
+    implementation 'com.facebook.android:account-kit-sdk:4.29.0'
+    implementation('com.facebook.android:facebook-share:4.29.0')
 
     //slider
     implementation 'com.nineoldandroids:library:2.4.0'

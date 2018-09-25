@@ -36,34 +36,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:weightSum="2">
+        android:weightSum="1">
 
         <Button
-            android:id="@+id/btnSignUp"
+            android:id="@+id/btn_continue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="1"
             android:background="@color/btnSignUp"
             android:shadowColor="@android:color/black"
-            android:text="Sign Up"
+            android:text="Continue"
             android:textColor="@android:color/white"/>
-
-        <Button
-            android:id="@+id/btnSignIn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="@color/btnSignActive"
-            android:shadowColor="@android:color/black"
-            android:text="Sign In"
-            android:textColor="@android:color/white"/>
-
-
-
-
-
 
     </LinearLayout>
 
