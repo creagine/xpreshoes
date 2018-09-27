@@ -296,21 +296,21 @@ public class FoodList extends AppCompatActivity {
 
 
                 //Add favorites
-                if (localDB.isFavorites(adapter.getRef(position).getKey()))
+                if (localDB.isFavorites(adapter.getRef(position).getKey(),Common.currentUser.getPhone()))
                     viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
 
                 //Click to change state of favorites
                 viewHolder.fav_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (!localDB.isFavorites(adapter.getRef(position).getKey()))
+                        if (!localDB.isFavorites(adapter.getRef(position).getKey(),Common.currentUser.getPhone()))
                         {
-                            localDB.addToFavorites(adapter.getRef(position).getKey());
+                            localDB.addToFavorites(adapter.getRef(position).getKey(),Common.currentUser.getPhone());
                             viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
                             Toast.makeText(FoodList.this, ""+model.getName1()+" was added to Favorites", Toast.LENGTH_SHORT).show();
                         } else
                         {
-                            localDB.removeFromFavorites(adapter.getRef(position).getKey());
+                            localDB.removeFromFavorites(adapter.getRef(position).getKey(),Common.currentUser.getPhone());
                             viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                             Toast.makeText(FoodList.this, ""+model.getName1()+" was removed from Favorites", Toast.LENGTH_SHORT).show();
                         }

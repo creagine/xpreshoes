@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Database extends SQLiteAssetHelper{
     private static final String DB_NAME="expresDB.db";
-    private static final int DB_VER=2;
+    private static final int DB_VER=1;
 
     public Database(Context context, String name, String storageDirectory, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DB_NAME,null, DB_VER);
@@ -76,22 +76,22 @@ public class Database extends SQLiteAssetHelper{
     }
 
     //Favorites (Update or delete favorites item)
-    public void addToFavorites(String foodId)
+    public void addToFavorites(String foodId,String userPhone)
     {
         SQLiteDatabase db = getReadableDatabase();
-        String query = String.format("INSERT INTO Favorites(FoodId) VALUES('%s');",foodId);
+        String query = String.format("INSERT INTO Favorites(FoodId,UserPhone) VALUES('%s','%s');",foodId,userPhone);
         db.execSQL(query);
     }
-    public void removeFromFavorites(String foodId)
+    public void removeFromFavorites(String foodId,String userPhone)
     {
         SQLiteDatabase db = getReadableDatabase();
-        String query = String.format("DELETE FROM Favorites WHERE FoodId='%s';",foodId);
+        String query = String.format("DELETE FROM Favorites WHERE FoodId='%s' and UserPhone='%s';",foodId,userPhone);
         db.execSQL(query);
     }
-    public boolean isFavorites(String foodId)
+    public boolean isFavorites(String foodId,String userPhone)
     {
         SQLiteDatabase db = getReadableDatabase();
-        String query = String.format("SELECT * FROM Favorites WHERE FoodId='%s';",foodId);
+        String query = String.format("SELECT * FROM Favorites WHERE FoodId='%s' and UserPhone='%s';",foodId,userPhone);
         Cursor cursor = db.rawQuery(query,null);
         if (cursor.getCount() <= 0 )
         {
