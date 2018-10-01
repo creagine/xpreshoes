@@ -9,6 +9,9 @@ import com.creaginetech.expresshoes.Remote.APIService;
 import com.creaginetech.expresshoes.Remote.RetrofitClient;
 
 public class Common {
+
+    public static String topicName = "news";
+
     public static User currentUser;
 
     public static String PHONE_TEXT = "userPhone";

@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +50,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
@@ -392,12 +395,57 @@ public class HomeActivity extends AppCompatActivity
 
         }  else if (id == R.id.nav_home_address) {
             showHomeAddressDialog();
+
+        }   else if (id == R.id.nav_setting) {
+            showSettingDialog();
         }
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showSettingDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setTitle("SETTINGS");
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View layout_setting = inflater.inflate(R.layout.setting_layout,null);
+
+        final CheckBox checkBox_news = (CheckBox) layout_setting.findViewById(R.id.checkbox_news);
+        //Add code remember state of Checkbox
+        Paper.init(this);
+        String isSubscribe = Paper.book().read("sub_new");
+        if (isSubscribe == null || TextUtils.isEmpty(isSubscribe) || isSubscribe.equals("false"))
+            checkBox_news.setChecked(false);
+        else
+            checkBox_news.setChecked(true);
+
+        alertDialog.setView(layout_setting);
+
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                dialogInterface.dismiss();
+
+                if (checkBox_news.isChecked())
+                {
+                    FirebaseMessaging.getInstance().subscribeToTopic(Common.topicName);
+                    //Write value
+                    Paper.book().write("sub_new","true");
+                }
+                else
+                {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.topicName);
+                    //Write value
+                    Paper.book().write("sub_new","false");
+                }
+
+            }
+        });
+
+        alertDialog.show();
     }
 
     private void showHomeAddressDialog() {
