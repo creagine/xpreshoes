@@ -291,7 +291,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 requests.child(order_number)
                         .setValue(request);
                 //Delete Cart
-                new Database(getBaseContext()).cleanCart();
+                new Database(getBaseContext()).cleanCart(Common.currentUser.getPhone());
 
                 sendNotificationOrder(order_number);
 
@@ -390,7 +390,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void loadListFood() {
-        cart = new Database(this).getCarts();
+        cart = new Database(this).getCarts(Common.currentUser.getPhone());
         adapter = new CartAdapter(cart,this);
         adapter.notifyDataSetChanged(); //Cp 15
         recyclerView.setAdapter(adapter);
@@ -416,7 +416,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         //WE will remove item at List<Order> by position
         cart.remove(position);
         //After that, we will delete all old data from SQLite
-        new Database(this).cleanCart();
+        new Database(this).cleanCart(Common.currentUser.getPhone());
         //And fin  al, we will update new data from List<Order> to SQLite
         for (Order item:cart)
             new Database(this).addToCart(item);

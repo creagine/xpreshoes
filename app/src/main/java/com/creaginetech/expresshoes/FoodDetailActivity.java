@@ -96,6 +96,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
             @Override
             public void onClick(View view) {
                 new Database(getBaseContext()).addToCart(new Order(
+                        Common.currentUser.getPhone(),
                         foodId,
                         currentFood.getName1(),
                         numberButton.getNumber(),
@@ -111,7 +112,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
             }
         });
 
-        btnCart.setCount(new Database(this).getCountCart());
+        btnCart.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
 
         food_description = (TextView)findViewById(R.id.food_description);
