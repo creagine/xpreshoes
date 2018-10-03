@@ -4,16 +4,19 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,11 +27,14 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
+import com.creaginetech.expresshoes.Helper.RecyclerItemTouchHelper;
+import com.creaginetech.expresshoes.Interface.RecyclerItemTouchHelperListener;
 import com.creaginetech.expresshoes.Model.MyResponse;
 import com.creaginetech.expresshoes.Model.Notification;
 import com.creaginetech.expresshoes.Model.Order;
@@ -37,6 +43,7 @@ import com.creaginetech.expresshoes.Model.Sender;
 import com.creaginetech.expresshoes.Model.Token;
 import com.creaginetech.expresshoes.Remote.APIService;
 import com.creaginetech.expresshoes.ViewHolder.CartAdapter;
+import com.creaginetech.expresshoes.ViewHolder.CartViewHolder;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -68,7 +75,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CartActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,LocationListener{
+        GoogleApiClient.OnConnectionFailedListener,LocationListener, RecyclerItemTouchHelperListener {
 
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -88,6 +95,8 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
     APIService mService;
 
     Place shippingAddress;
+
+    RelativeLayout rootLayout;
 
     //Location-cp 36
     private LocationRequest mLocationRequest;
@@ -144,6 +153,8 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         //Init Service
         mService = Common.getFCMService();
 
+        rootLayout = (RelativeLayout)findViewById(R.id.rootLayout);
+
         //Firebase
         database = FirebaseDatabase.getInstance();
         requests=database.getReference("Requests");
@@ -153,7 +164,11 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        
+
+        //Swipe to delete
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,ItemTouchHelper.LEFT,this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
         txtTotalPrice = (TextView)findViewById(R.id.total);
         btnPlace = (Button)findViewById(R.id.btnPlaceOrder);
 
@@ -471,5 +486,53 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         displayLocation();
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof CartViewHolder)
+        {
+            String name = ((CartAdapter)recyclerView.getAdapter()).getItem(viewHolder.getAdapterPosition()).getProductName();
+
+            final Order deleteItem = ((CartAdapter)recyclerView.getAdapter()).getItem(viewHolder.getAdapterPosition());
+            final int deleteIndex = viewHolder.getAdapterPosition();
+
+            adapter.removeItem(deleteIndex);
+            new Database(getBaseContext()).removeFromCart(deleteItem.getProductId(),Common.currentUser.getPhone());
+
+            //Update tctTotal di cart
+            //Calculate total price
+            int total = 0;
+            List<Order> orders = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
+            for (Order itemCart : orders)
+                total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
+            Locale locale = new Locale("en","US");
+            NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
+            txtTotalPrice.setText(fmt.format(total));
+
+            //Make Snackbar
+            Snackbar snackbar = Snackbar.make(rootLayout,name + "Removed from cart !",Snackbar.LENGTH_SHORT);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapter.restoreItem(deleteItem,deleteIndex);
+                    new Database(getBaseContext()).addToCart(deleteItem);
+
+                    //Update tctTotal di cart
+                    //Calculate total price
+                    int total = 0;
+                    List<Order> orders = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
+                    for (Order itemCart : orders)
+                        total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
+                    Locale locale = new Locale("en","US");
+                    NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
+                    txtTotalPrice.setText(fmt.format(total));
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
     }
 }
