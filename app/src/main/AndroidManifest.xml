@@ -23,23 +23,18 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDbct8Eibxlx7w2yItjncS2lkzLPBoH_MQ"/>
-
+            android:value="AIzaSyDbct8Eibxlx7w2yItjncS2lkzLPBoH_MQ" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
-
-        <meta-data android:name="com.facebook.accountkit.ApplicationName"
+        <meta-data
+            android:name="com.facebook.accountkit.ApplicationName"
             android:value="@string/app_name" />
-        <meta-data android:name="com.facebook.accountkit.ClientToken"
+        <meta-data
+            android:name="com.facebook.accountkit.ClientToken"
             android:value="@string/ACCOUNT_KIT_CLIENT_TOKEN" />
 
-
-        <activity
-            android:name="com.facebook.accountkit.ui.AccountKitActivity"/>
-
-
-
+        <activity android:name="com.facebook.accountkit.ui.AccountKitActivity" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -70,16 +65,16 @@
 
         <service android:name=".Service.MyFirebaseIdService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
         <service android:name=".Service.MyFirebaseMessaging">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
+        <activity android:name=".SearchActivity"></activity>
     </application>
 
 </manifest>

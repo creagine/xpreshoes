@@ -11,7 +11,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
-        
+
     }
     buildTypes {
         release {
@@ -53,7 +53,8 @@ dependencies {
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0' //to apply font for all views in project
     implementation 'com.google.firebase:firebase-messaging:11.6.2' //firebase messaging
     implementation 'io.paperdb:paperdb:2.1' //help you write key-value to Android memory -cp 16
-    implementation 'com.github.rey5137:material:1.2.4' //add material check box to your project cp-16
+    implementation 'com.github.rey5137:material:1.2.4'
+    //add material check box to your project cp-16
     implementation 'com.stepstone.apprating:app-rating:2.0.0' // add material rating
     implementation 'com.github.d-max:spots-dialog:0.7@aar' //add SpotsDialog
     implementation 'com.google.firebase:firebase-core:11.6.2'
