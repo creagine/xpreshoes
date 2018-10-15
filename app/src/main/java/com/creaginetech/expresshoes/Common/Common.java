@@ -23,11 +23,14 @@ public class Common {
         return RetrofitClient.getClient(BASE_URL).create(APIService.class);
     }
 
-    public static String covertCodeToStatus(String status) {
-        if(status.equals("0"))
+    public static String convertCodeToStatus(String code)
+    {
+        if(code.equals("0"))
             return "Placed";
-        else if (status.equals("1"))
+        else if (code.equals("1"))
             return "On my way";
+        else if (code.equals("2"))
+            return "Shipping";
         else
             return "Shipped";
     }

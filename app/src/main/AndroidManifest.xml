@@ -74,7 +74,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".SearchActivity"></activity>
+        <activity android:name=".SearchActivity" />
     </application>
 
 </manifest>
