@@ -2,6 +2,7 @@ package com.creaginetech.expresshoes.ViewHolder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
@@ -13,6 +14,8 @@ public class OrderViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     private ItemClickListener itemClickListener;
 
+    public ImageView btn_delete;
+
     public OrderViewHolder(View itemView) {
         super(itemView);
 
@@ -20,6 +23,7 @@ public class OrderViewHolder extends RecyclerView.ViewHolder implements View.OnC
         txtOrderId = (TextView)itemView.findViewById(R.id.order_id);
         txtOrderStatus = (TextView)itemView.findViewById(R.id.order_status);
         txtOrderPhone = (TextView)itemView.findViewById(R.id.order_phone);
+        btn_delete = (ImageView)itemView.findViewById(R.id.btn_delete);
 
         itemView.setOnClickListener(this);
     }
