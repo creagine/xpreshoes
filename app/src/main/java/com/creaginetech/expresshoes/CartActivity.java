@@ -157,7 +157,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        requests=database.getReference("Requests");
+        requests=database.getReference("Restaurants").child(Common.restaurantSelected).child("Requests");
 
         //Init
         recyclerView = (RecyclerView)findViewById(R.id.listCart);
@@ -297,6 +297,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                         "0", // status
                         edtComment.getText().toString(),
                         String.format("%s,%s",shippingAddress.getLatLng().latitude,shippingAddress.getLatLng().longitude),
+                        Common.restaurantSelected,
                         cart
                 );
 
