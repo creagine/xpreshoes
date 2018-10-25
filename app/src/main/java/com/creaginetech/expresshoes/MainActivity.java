@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                                                 User localUser = dataSnapshot.getValue(User.class);
                                                                                 //copy from SigninActivity
-                                                                                Intent homeIntent = new Intent(MainActivity.this, RestaurantList.class);
+                                                                                Intent homeIntent = new Intent(MainActivity.this, MainNewActivity.class);
                                                                                 Common.currentUser = localUser;
                                                                                 startActivity(homeIntent);
                                                                                 //Dissmis dialog
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                                 User localUser = dataSnapshot.getValue(User.class);
                                                                 //copy from SigninActivity
-                                                                Intent homeIntent = new Intent(MainActivity.this, RestaurantList.class);
+                                                                Intent homeIntent = new Intent(MainActivity.this, MainNewActivity.class);
                                                                 Common.currentUser = localUser;
                                                                 startActivity(homeIntent);
                                                                 //Dissmis dialog

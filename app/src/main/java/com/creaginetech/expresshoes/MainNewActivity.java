@@ -1,5 +1,6 @@
 package com.creaginetech.expresshoes;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -14,7 +15,16 @@ import com.creaginetech.expresshoes.Fragment.HomeFragment;
 import com.creaginetech.expresshoes.Fragment.TransactionFragment;
 import com.creaginetech.expresshoes.Helper.BottomNavigationViewHelper;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class MainNewActivity extends AppCompatActivity {
+
+    //calligraphy
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

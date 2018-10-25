@@ -13,9 +13,10 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
-import com.creaginetech.expresshoes.CartActivity;
+//import com.creaginetech.expresshoes.CartActivity;
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
+import com.creaginetech.expresshoes.Fragment.CartFragment;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Order;
 import com.creaginetech.expresshoes.R;
@@ -31,16 +32,16 @@ import java.util.Locale;
 public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
 
     private List<Order> listData = new ArrayList<>();
-    private CartActivity cart;
+    private CartFragment cart;
 
-    public CartAdapter(List<Order> listData, CartActivity cart) {
+    public CartAdapter(List<Order> listData, CartFragment cart) {
         this.listData = listData;
         this.cart = cart;
     }
 
     @Override
     public CartViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(cart);
+        LayoutInflater inflater = LayoutInflater.from(cart.getActivity());
         View itemView = inflater.inflate(R.layout.cart_layout,parent,false);
         return new CartViewHolder(itemView);
     }
@@ -53,7 +54,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
 
 
         //memunculkan gambar di cart
-        Picasso.with(cart.getBaseContext())
+        Picasso.with(cart.getActivity().getBaseContext())
                 .load(listData.get(position).getImage())
                 .resize(70,70) //70dp
                 .centerCrop()
@@ -65,12 +66,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
             public void onValueChange(ElegantNumberButton view, int oldValue, int newValue) {
                 Order order = listData.get(position);
                 order.setQuantity(String.valueOf(newValue));
-                new Database(cart).updateCart(order);
+                new Database(cart.getActivity()).updateCart(order);
 
                 //Update tctTotal di cart
                 //Calculate total price
                 int total = 0;
-                List<Order> orders = new Database(cart).getCarts(Common.currentUser.getPhone());
+                List<Order> orders = new Database(cart.getActivity()).getCarts(Common.currentUser.getPhone());
                 for (Order itemCart : orders)
                     total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
                 Locale locale = new Locale("en","US");
