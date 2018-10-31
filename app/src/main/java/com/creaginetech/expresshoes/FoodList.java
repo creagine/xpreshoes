@@ -3,6 +3,7 @@ package com.creaginetech.expresshoes;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
@@ -39,6 +42,10 @@ import java.util.List;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+
 public class FoodList extends AppCompatActivity {
 
     RecyclerView recyclerView;
@@ -62,6 +69,11 @@ public class FoodList extends AppCompatActivity {
     //swipe refresh
     SwipeRefreshLayout swipeRefreshLayout;
 
+    BottomSheetBehavior sheetBehavior;
+    LinearLayout layoutBottomSheet;
+    TextView txtTotalItems;
+
+    List<Order> cart = new ArrayList<>();
 
     //calligraphy
     @Override
@@ -193,6 +205,43 @@ public class FoodList extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        layoutBottomSheet = findViewById(R.id.bottom_sheet);
+        txtTotalItems = findViewById(R.id.totalitems);
+
+        sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
+
+        sheetBehavior.setState(STATE_HIDDEN);
+
+        /**
+         * bottom sheet state change listener
+         * we are changing button text when sheet changed state
+         * */
+        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+//                        btnBottomSheet.setText("Close Sheet");
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+//                        btnBottomSheet.setText("Expand Sheet");
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
 
     }
 
@@ -292,10 +341,26 @@ public class FoodList extends AppCompatActivity {
 
                             ));
 
+                            cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
+                            int totalitems = 0;
+                            for (Order order:cart)
+                                totalitems +=((Integer.parseInt(order.getQuantity())));
+
+                            txtTotalItems.setText(String.valueOf(totalitems));
+
 
                         } else {
                             new Database(getBaseContext()).increaseCart(Common.currentUser.getPhone(), adapter.getRef(position).getKey());
+
+                            cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
+                            int totalitems = 0;
+                            for (Order order:cart)
+                                totalitems +=((Integer.parseInt(order.getQuantity())));
+
+                            txtTotalItems.setText(String.valueOf(totalitems));
                         }
+
+                        sheetBehavior.setState(STATE_EXPANDED);
                         Toast.makeText(FoodList.this, "Added to Cart", Toast.LENGTH_SHORT).show();
                     }
                 });

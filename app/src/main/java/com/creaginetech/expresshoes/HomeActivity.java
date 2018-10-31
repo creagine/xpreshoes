@@ -63,10 +63,10 @@ import io.paperdb.Paper;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity extends AppCompatActivity {
+//        implements NavigationView.OnNavigationItemSelectedListener {
 
-
+    //variable firebase database
     FirebaseDatabase database;
     DatabaseReference category;
 
@@ -75,6 +75,7 @@ public class HomeActivity extends AppCompatActivity
     RecyclerView recycler_menu;
     RecyclerView.LayoutManager layoutManager;
 
+    //firebase recycler adapter
     FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
 
     SwipeRefreshLayout swipeRefreshLayout;
@@ -85,7 +86,7 @@ public class HomeActivity extends AppCompatActivity
     HashMap<String,String> image_list;
     SliderLayout mSlider;
 
-
+    //tombol back to exit
     boolean doubleBackToExitPressedOnce = false;
 
 
@@ -108,7 +109,7 @@ public class HomeActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_home);
 
-
+        //toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Menu");
         setSupportActionBar(toolbar);
@@ -153,7 +154,7 @@ public class HomeActivity extends AppCompatActivity
         Paper.init(this);
 
         //Cart FAB
-        //BUG
+        //BUG kalo diklik
         fab = (CounterFab) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,24 +164,25 @@ public class HomeActivity extends AppCompatActivity
                 startActivity(cartIntent);
             }
         });
+
         //count cart
         fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
-
+        //drawer layout navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
 
 
         //Set Name for user
-        View headerView = navigationView.getHeaderView(0);
-        txtFullName = (TextView)headerView.findViewById(R.id.txtFullName);
-        txtFullName.setText(Common.currentUser.getName());
+//        View headerView = navigationView.getHeaderView(0);
+//        txtFullName = (TextView)headerView.findViewById(R.id.txtFullName);
+//        txtFullName.setText(Common.currentUser.getName());
 
         //Load menu
         recycler_menu = (RecyclerView)findViewById(R.id.recycler_menu);
@@ -375,183 +377,186 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_menu) {
-
-            //moved to bottomnav
-        } else if (id == R.id.nav_cart) {
-            Intent cartIntent = new Intent(HomeActivity.this,CartFragment.class);
-            startActivity(cartIntent);
-
-            //moved to bottomnav
-        } else if (id == R.id.nav_orders) {
-            Intent orderIntent = new Intent(HomeActivity.this,OrderStatusActivity.class);
-            startActivity(orderIntent);
-
-        } else if (id == R.id.nav_log_out) {
-
-            //Delete remember user and password (delete all key value saved after press logout (exit app))
-            Paper.book().destroy();
-
-            //Logout
-
-            Intent signIn = new Intent(HomeActivity.this,MainActivity.class);
-            signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            AccountKit.logOut();
-            startActivity(signIn);
-
-
-
-        } else if (id == R.id.nav_update_name) {
-            showChangePasswordDialog();
-
-        }  else if (id == R.id.nav_home_address) {
-            showHomeAddressDialog();
-
-        }   else if (id == R.id.nav_setting) {
-            showSettingDialog();
-        }
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void showSettingDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
-        alertDialog.setTitle("SETTINGS");
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View layout_setting = inflater.inflate(R.layout.setting_layout,null);
-
-        final CheckBox checkBox_news = (CheckBox) layout_setting.findViewById(R.id.checkbox_news);
-        //Add code remember state of Checkbox
-        Paper.init(this);
-        String isSubscribe = Paper.book().read("sub_new");
-        if (isSubscribe == null || TextUtils.isEmpty(isSubscribe) || isSubscribe.equals("false"))
-            checkBox_news.setChecked(false);
-        else
-            checkBox_news.setChecked(true);
-
-        alertDialog.setView(layout_setting);
-
-        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                dialogInterface.dismiss();
-
-                if (checkBox_news.isChecked())
-                {
-                    FirebaseMessaging.getInstance().subscribeToTopic(Common.topicName);
-                    //Write value
-                    Paper.book().write("sub_new","true");
-                }
-                else
-                {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.topicName);
-                    //Write value
-                    Paper.book().write("sub_new","false");
-                }
-
-            }
-        });
-
-        alertDialog.show();
-    }
-
-    private void showHomeAddressDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
-        alertDialog.setTitle("CHANGE HOME ADDRESS");
-        alertDialog.setMessage("Please fill all information !");
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View layout_home = inflater.inflate(R.layout.home_address_layout,null);
-
-        final MaterialEditText edtHomeAddress = (MaterialEditText)layout_home.findViewById(R.id.edtHomeAddress);
-
-        alertDialog.setView(layout_home);
-
-        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                dialogInterface.dismiss();
-
-                //set new home address
-                Common.currentUser.setHomeAddress(edtHomeAddress.getText().toString());
-
-                FirebaseDatabase.getInstance().getReference("User")
-                        .child(Common.currentUser.getPhone())
-                        .setValue(Common.currentUser)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(HomeActivity.this, "Update Address Successful", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-            }
-        });
-
-        alertDialog.show();
-    }
-
-    private void showChangePasswordDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
-        alertDialog.setTitle("UPDATE NAME");
-        alertDialog.setMessage("Please fill all information !");
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View layout_name = inflater.inflate(R.layout.update_name_layout,null);
-
-        final MaterialEditText edtName = (MaterialEditText)layout_name.findViewById(R.id.edtName);
-
-        alertDialog.setView(layout_name);
-
-        //Button
-        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //For use SpotsDialog, please use AlertDialog from android.app, not from v7 like above AlertDialog
-                final android.app.AlertDialog waitingDialog = new SpotsDialog(HomeActivity.this);
-                waitingDialog.show();
-
-                //Update Name
-                Map<String,Object> update_name = new HashMap<>();
-                update_name.put("name",edtName.getText().toString());
-
-                FirebaseDatabase.getInstance()
-                        .getReference("User")
-                        .child(Common.currentUser.getPhone())
-                        .updateChildren(update_name)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                //Dismiss dialog
-                                waitingDialog.dismiss();
-                                if (task.isSuccessful())
-                                    Toast.makeText(HomeActivity.this, "Name was updated", Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_menu) {
+//
+//            //moved to bottomnav
+//        } else if (id == R.id.nav_cart) {
+//            Intent cartIntent = new Intent(HomeActivity.this,CartFragment.class);
+//            startActivity(cartIntent);
+//
+//            //moved to bottomnav
+//        } else if (id == R.id.nav_orders) {
+//            Intent orderIntent = new Intent(HomeActivity.this,OrderStatusActivity.class);
+//            startActivity(orderIntent);
+//
+//        } else if (id == R.id.nav_log_out) {
+//
+//            //Delete remember user and password (delete all key value saved after press logout (exit app))
+//            Paper.book().destroy();
+//
+//            //Logout
+//
+//            Intent signIn = new Intent(HomeActivity.this,MainActivity.class);
+//            signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            AccountKit.logOut();
+//            startActivity(signIn);
+//
+//
+//
+//        } else if (id == R.id.nav_update_name) {
+//            showChangePasswordDialog();
+//
+//        }  else if (id == R.id.nav_home_address) {
+//            showHomeAddressDialog();
+//
+//        }   else if (id == R.id.nav_setting) {
+//            showSettingDialog();
+//        }
+//
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
 
 
-            }
-        });
+//    private void showSettingDialog() {
+//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+//        alertDialog.setTitle("SETTINGS");
+//
+//        LayoutInflater inflater = LayoutInflater.from(this);
+//        View layout_setting = inflater.inflate(R.layout.setting_layout,null);
+//
+//        final CheckBox checkBox_news = (CheckBox) layout_setting.findViewById(R.id.checkbox_news);
+//        //Add code remember state of Checkbox
+//        Paper.init(this);
+//        String isSubscribe = Paper.book().read("sub_new");
+//        if (isSubscribe == null || TextUtils.isEmpty(isSubscribe) || isSubscribe.equals("false"))
+//            checkBox_news.setChecked(false);
+//        else
+//            checkBox_news.setChecked(true);
+//
+//        alertDialog.setView(layout_setting);
+//
+//        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int which) {
+//                dialogInterface.dismiss();
+//
+//                if (checkBox_news.isChecked())
+//                {
+//                    FirebaseMessaging.getInstance().subscribeToTopic(Common.topicName);
+//                    //Write value
+//                    Paper.book().write("sub_new","true");
+//                }
+//                else
+//                {
+//                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.topicName);
+//                    //Write value
+//                    Paper.book().write("sub_new","false");
+//                }
+//
+//            }
+//        });
+//
+//        alertDialog.show();
+//    }
 
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
 
-            }
-        });
+//    private void showHomeAddressDialog() {
+//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+//        alertDialog.setTitle("CHANGE HOME ADDRESS");
+//        alertDialog.setMessage("Please fill all information !");
+//
+//        LayoutInflater inflater = LayoutInflater.from(this);
+//        View layout_home = inflater.inflate(R.layout.home_address_layout,null);
+//
+//        final MaterialEditText edtHomeAddress = (MaterialEditText)layout_home.findViewById(R.id.edtHomeAddress);
+//
+//        alertDialog.setView(layout_home);
+//
+//        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int which) {
+//                dialogInterface.dismiss();
+//
+//                //set new home address
+//                Common.currentUser.setHomeAddress(edtHomeAddress.getText().toString());
+//
+//                FirebaseDatabase.getInstance().getReference("User")
+//                        .child(Common.currentUser.getPhone())
+//                        .setValue(Common.currentUser)
+//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                Toast.makeText(HomeActivity.this, "Update Address Successful", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//
+//            }
+//        });
+//
+//        alertDialog.show();
+//    }
 
-        alertDialog.show();
 
-    }
+//    private void showChangePasswordDialog() {
+//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+//        alertDialog.setTitle("UPDATE NAME");
+//        alertDialog.setMessage("Please fill all information !");
+//
+//        LayoutInflater inflater = LayoutInflater.from(this);
+//        View layout_name = inflater.inflate(R.layout.update_name_layout,null);
+//
+//        final MaterialEditText edtName = (MaterialEditText)layout_name.findViewById(R.id.edtName);
+//
+//        alertDialog.setView(layout_name);
+//
+//        //Button
+//        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                //For use SpotsDialog, please use AlertDialog from android.app, not from v7 like above AlertDialog
+//                final android.app.AlertDialog waitingDialog = new SpotsDialog(HomeActivity.this);
+//                waitingDialog.show();
+//
+//                //Update Name
+//                Map<String,Object> update_name = new HashMap<>();
+//                update_name.put("name",edtName.getText().toString());
+//
+//                FirebaseDatabase.getInstance()
+//                        .getReference("User")
+//                        .child(Common.currentUser.getPhone())
+//                        .updateChildren(update_name)
+//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                //Dismiss dialog
+//                                waitingDialog.dismiss();
+//                                if (task.isSuccessful())
+//                                    Toast.makeText(HomeActivity.this, "Name was updated", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//                        });
+//
+//
+//            }
+//        });
+//
+//        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//
+//            }
+//        });
+//
+//        alertDialog.show();
+//
+//    }
 }

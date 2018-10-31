@@ -61,6 +61,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
                 .into(holder.cart_image);
 
         holder.btn_quantity.setNumber(listData.get(position).getQuantity());
+
         holder.btn_quantity.setOnValueChangeListener(new ElegantNumberButton.OnValueChangeListener() {
             @Override
             public void onValueChange(ElegantNumberButton view, int oldValue, int newValue) {
@@ -77,6 +78,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
                 Locale locale = new Locale("en","US");
                 NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
+                int totalitems = 0;
+                for (Order itemCart :orders)
+                    totalitems +=((Integer.parseInt(itemCart.getQuantity())));
+
+                cart.txtTotalItems.setText(String.valueOf(totalitems));
                 cart.txtTotalPrice.setText(fmt.format(total));
 
 

@@ -82,7 +82,7 @@ public class CartFragment extends Fragment implements GoogleApiClient.Connection
     FirebaseDatabase database;
     DatabaseReference requests;
 
-    public TextView txtTotalPrice; //public agar bisa dipanggil di cartAdapter
+    public TextView txtTotalPrice, txtTotalItems; //public agar bisa dipanggil di cartAdapter
     Button btnPlace;
 
     String address;
@@ -167,6 +167,7 @@ public class CartFragment extends Fragment implements GoogleApiClient.Connection
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         txtTotalPrice = (TextView)view.findViewById(R.id.total);
+        txtTotalItems = view.findViewById(R.id.totalItemsCart);
         btnPlace = (Button)view.findViewById(R.id.btnPlaceOrder);
 
         btnPlace.setOnClickListener(new View.OnClickListener() {
@@ -415,6 +416,11 @@ public class CartFragment extends Fragment implements GoogleApiClient.Connection
         Locale locale = new Locale("en","US");
         NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
+        int totalitems = 0;
+        for (Order order:cart)
+            totalitems +=((Integer.parseInt(order.getQuantity())));
+
+        txtTotalItems.setText(String.valueOf(totalitems));
         txtTotalPrice.setText(fmt.format(total));
     }
 
@@ -501,10 +507,17 @@ public class CartFragment extends Fragment implements GoogleApiClient.Connection
             //Calculate total price
             int total = 0;
             List<Order> orders = new Database(getActivity().getBaseContext()).getCarts(Common.currentUser.getPhone());
+
             for (Order itemCart : orders)
                 total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
             Locale locale = new Locale("en","US");
             NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
+            int totalitems = 0;
+            for (Order order:cart)
+                totalitems +=((Integer.parseInt(order.getQuantity())));
+
+            txtTotalItems.setText(String.valueOf(totalitems));
 
             txtTotalPrice.setText(fmt.format(total));
 
@@ -524,6 +537,12 @@ public class CartFragment extends Fragment implements GoogleApiClient.Connection
                         total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
                     Locale locale = new Locale("en","US");
                     NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
+                    int totalitems = 0;
+                    for (Order order:cart)
+                        totalitems +=((Integer.parseInt(order.getQuantity())));
+
+                    txtTotalItems.setText(String.valueOf(totalitems));
 
                     txtTotalPrice.setText(fmt.format(total));
                 }
