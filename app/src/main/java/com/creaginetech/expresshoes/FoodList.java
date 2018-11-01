@@ -36,8 +36,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -71,7 +73,7 @@ public class FoodList extends AppCompatActivity {
 
     BottomSheetBehavior sheetBehavior;
     LinearLayout layoutBottomSheet;
-    TextView txtTotalItems;
+    TextView txtTotalItems, txtTotalPrice;
 
     List<Order> cart = new ArrayList<>();
 
@@ -207,6 +209,7 @@ public class FoodList extends AppCompatActivity {
 
         layoutBottomSheet = findViewById(R.id.bottom_sheet);
         txtTotalItems = findViewById(R.id.totalitems);
+        txtTotalPrice = findViewById(R.id.totalprice);
 
         sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
 
@@ -242,6 +245,17 @@ public class FoodList extends AppCompatActivity {
 
             }
         });
+
+        layoutBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(FoodList.this, CartNewActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
     }
 
@@ -341,24 +355,25 @@ public class FoodList extends AppCompatActivity {
 
                             ));
 
-                            cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
-                            int totalitems = 0;
-                            for (Order order:cart)
-                                totalitems +=((Integer.parseInt(order.getQuantity())));
-
-                            txtTotalItems.setText(String.valueOf(totalitems));
-
-
                         } else {
                             new Database(getBaseContext()).increaseCart(Common.currentUser.getPhone(), adapter.getRef(position).getKey());
 
-                            cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
-                            int totalitems = 0;
-                            for (Order order:cart)
-                                totalitems +=((Integer.parseInt(order.getQuantity())));
-
-                            txtTotalItems.setText(String.valueOf(totalitems));
                         }
+
+                        //TOTAL ITEMS DI BOTTOM SHEET
+                        cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
+                        int totalitems = 0;
+                        for (Order order:cart)
+                            totalitems +=((Integer.parseInt(order.getQuantity())));
+
+                        int total = 0;
+                        for (Order order:cart)
+                            total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(order.getQuantity()));
+                        Locale locale = new Locale("en","US");
+                        NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
+                        txtTotalItems.setText(String.valueOf(totalitems));
+                        txtTotalPrice.setText(fmt.format(total));
 
                         sheetBehavior.setState(STATE_EXPANDED);
                         Toast.makeText(FoodList.this, "Added to Cart", Toast.LENGTH_SHORT).show();
@@ -425,5 +440,21 @@ public class FoodList extends AppCompatActivity {
         //show item in food list when click back from food detail
         if (adapter != null)
             adapter.startListening();
+
+        //TOTAL ITEMS DI BOTTOM SHEET
+        cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
+        int totalitems = 0;
+        for (Order order:cart)
+            totalitems +=((Integer.parseInt(order.getQuantity())));
+
+        int total = 0;
+        for (Order order:cart)
+            total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(order.getQuantity()));
+        Locale locale = new Locale("en","US");
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
+        txtTotalItems.setText(String.valueOf(totalitems));
+        txtTotalPrice.setText(fmt.format(total));
+
     }
 }

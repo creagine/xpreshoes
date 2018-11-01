@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.andremion.counterfab.CounterFab;
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
-import com.creaginetech.expresshoes.Fragment.CartFragment;
+//import com.creaginetech.expresshoes.Fragment.CartFragment;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Banner;
 import com.creaginetech.expresshoes.Model.Category;
@@ -160,7 +160,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Button add Cart
-                Intent cartIntent = new Intent(HomeActivity.this,CartFragment.class);
+                Intent cartIntent = new Intent(HomeActivity.this,CartNewActivity.class);
                 startActivity(cartIntent);
             }
         });

@@ -76,7 +76,8 @@
 
         <activity android:name=".SearchActivity" />
         <activity android:name=".RestaurantList" />
-        <activity android:name=".MainNewActivity"></activity>
+        <activity android:name=".MainNewActivity" />
+        <activity android:name=".CartNewActivity"></activity>
     </application>
 
 </manifest>
