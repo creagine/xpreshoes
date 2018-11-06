@@ -131,7 +131,7 @@ public class FoodList extends AppCompatActivity {
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
-                //Get Intent Here
+                //ambil data intent sebelumnya
                 if (getIntent() != null)
                     categoryId = getIntent().getStringExtra("CategoryId");
                 if (!categoryId.isEmpty() && categoryId != null) {
@@ -207,6 +207,8 @@ public class FoodList extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+
+        //BOTTOMSHEET
         layoutBottomSheet = findViewById(R.id.bottom_sheet);
         txtTotalItems = findViewById(R.id.totalitems);
         txtTotalPrice = findViewById(R.id.totalprice);
@@ -457,4 +459,25 @@ public class FoodList extends AppCompatActivity {
         txtTotalPrice.setText(fmt.format(total));
 
     }
+
+    private void deletecart(){
+
+        //WE will remove item at List<Order> by position
+        cart.removeAll(cart);
+        //After that, we will delete all old data from SQLite
+        new Database(this).cleanCart(Common.currentUser.getPhone());
+        //And final, we will update new data from List<Order> to SQLite
+        for (Order item:cart)
+            new Database(this).addToCart(item);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        deletecart();
+
+    }
+
 }

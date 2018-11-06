@@ -9,8 +9,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -33,7 +36,10 @@ import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Banner;
 import com.creaginetech.expresshoes.Model.Category;
+import com.creaginetech.expresshoes.Model.Food;
+import com.creaginetech.expresshoes.Model.Order;
 import com.creaginetech.expresshoes.Model.Token;
+import com.creaginetech.expresshoes.ViewHolder.FoodViewHolder;
 import com.creaginetech.expresshoes.ViewHolder.MenuViewHolder;
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
@@ -49,13 +55,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
@@ -78,6 +88,7 @@ public class HomeActivity extends AppCompatActivity {
     //firebase recycler adapter
     FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
 
+    //swipe refresh
     SwipeRefreshLayout swipeRefreshLayout;
 
     CounterFab fab;
@@ -88,6 +99,11 @@ public class HomeActivity extends AppCompatActivity {
 
     //tombol back to exit
     boolean doubleBackToExitPressedOnce = false;
+
+    //search Functionality
+    FirebaseRecyclerAdapter<Category, MenuViewHolder> searchAdapter;
+    List<String> suggestList = new ArrayList<>();
+    MaterialSearchBar materialSearchBar;
 
 
     //calligraphy
@@ -110,9 +126,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         //toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Menu");
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar.setTitle("Menu");
+//        setSupportActionBar(toolbar);
 
         //View - cp-28 (Refresh layout)
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_layout);
@@ -142,6 +158,64 @@ public class HomeActivity extends AppCompatActivity {
                     Toast.makeText(getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
                     return;
                 }
+
+                //Because search function need category so we need paste code here
+                //after getIntent categoryId
+                //Search
+                materialSearchBar = (MaterialSearchBar) findViewById(R.id.searchBar);
+                materialSearchBar.setHint("Enter your food");
+                loadSuggest(); // Write function to load suggest from firebase
+
+                materialSearchBar.setCardViewElevation(10);
+                materialSearchBar.addTextChangeListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //When user type their text, we will change suggest list
+
+                        List<String> suggest = new ArrayList<String>();
+                        for (String search : suggestList) // loop in suggest list
+                        {
+                            if (search.toLowerCase().contains(materialSearchBar.getText().toLowerCase()))
+                                suggest.add(search);
+                        }
+                        materialSearchBar.setLastSuggestions(suggest);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+                materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+                    @Override
+                    public void onSearchStateChanged(boolean enabled) {
+                        //When Search Bar is close
+                        //Restore original adapter
+                        if (!enabled)
+                            recycler_menu.setAdapter(adapter);
+                    }
+
+                    @Override
+                    public void onSearchConfirmed(CharSequence text) {
+                        //WHen search finish
+                        //Show result of search adapter
+
+                        startSearch(text);
+
+
+                    }
+
+                    @Override
+                    public void onButtonClicked(int buttonCode) {
+
+                    }
+                });
+
             }
         });
 
@@ -155,25 +229,25 @@ public class HomeActivity extends AppCompatActivity {
 
         //Cart FAB
         //BUG kalo diklik
-        fab = (CounterFab) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Button add Cart
-                Intent cartIntent = new Intent(HomeActivity.this,CartNewActivity.class);
-                startActivity(cartIntent);
-            }
-        });
-
-        //count cart
-        fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
+//        fab = (CounterFab) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //Button add Cart
+//                Intent cartIntent = new Intent(HomeActivity.this,CartNewActivity.class);
+//                startActivity(cartIntent);
+//            }
+//        });
+//
+//        //count cart
+//        fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
         //drawer layout navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
 
 //        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 //        navigationView.setNavigationItemSelectedListener(this);
@@ -186,8 +260,9 @@ public class HomeActivity extends AppCompatActivity {
 
         //Load menu
         recycler_menu = (RecyclerView)findViewById(R.id.recycler_menu);
-
-        recycler_menu.setLayoutManager(new GridLayoutManager(this,2)); //grid layout halaman home
+        recycler_menu.setHasFixedSize(true);
+        recycler_menu.setLayoutManager(new LinearLayoutManager(this)); //grid layout halaman home
+        recycler_menu.setLayoutManager(layoutManager);
 
 
         //to add your token when login app
@@ -309,6 +384,64 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    private void startSearch(CharSequence text) {
+        //Create query by name
+        Query searchByName = category.orderByChild("name").equalTo(text.toString());
+        //Create option with query
+        FirebaseRecyclerOptions<Category> foodOptions = new FirebaseRecyclerOptions.Builder<Category>()
+                .setQuery(searchByName, Category.class)
+                .build();
+
+        searchAdapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(foodOptions) {
+            @Override
+            protected void onBindViewHolder(@NonNull MenuViewHolder viewHolder, int position, @NonNull Category model) {
+                viewHolder.txtMenuName.setText(model.getName());
+                Picasso.with(getBaseContext()).load(model.getImage())
+                        .into(viewHolder.imageView);
+
+                final Category local = model;
+                viewHolder.setItemClickListener(new ItemClickListener() {
+                    @Override
+                    public void onClick(View view, int position, boolean isLongClick) {
+                        //Start new activity
+                        Intent foodDetail = new Intent(HomeActivity.this, FoodList.class);
+                        foodDetail.putExtra("CategoryId", searchAdapter.getRef(position).getKey()); // Send Food Id to new activity
+                        startActivity(foodDetail);
+                    }
+                });
+            }
+
+            @Override
+            public MenuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.menu_item, parent, false);
+                return new MenuViewHolder(itemView);
+            }
+        };
+        searchAdapter.startListening();
+        recycler_menu.setAdapter(searchAdapter); // Set adapter for Recycler View is Search result
+    }
+
+    private void loadSuggest() {
+        category.orderByChild("CategoryId")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            Category item = postSnapshot.getValue(Category.class);
+                            suggestList.add(item.getName()); // Add name of food to suggest list
+                        }
+
+                        materialSearchBar.setLastSuggestions(suggestList);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -319,7 +452,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
+//        fab.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
         //show category when click back button from food
         if (adapter != null)
             adapter.startListening();
@@ -353,6 +486,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
             super.onBackPressed();
+
+
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
                 return;
@@ -377,7 +512,7 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @SuppressWarnings("StatementWithEmptyBody")
+    //    @SuppressWarnings("StatementWithEmptyBody")
 //    @Override
 //    public boolean onNavigationItemSelected(MenuItem item) {
 //        // Handle navigation view item clicks here.
