@@ -47,7 +47,7 @@ dependencies {
     implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.daimajia.slider:library:1.1.5@aar'
 
-    implementation 'com.google.android.gms:play-services-places:11.6.2'//Google service
+//    implementation 'com.google.android.gms:play-services-places:11.6.2'//Google service
     implementation 'com.google.android.gms:play-services:11.6.2'//Google service
     implementation 'com.github.andremion:counterfab:1.0.1' //counterFAB
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0' //to apply font for all views in project
@@ -68,6 +68,18 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.firebaseui:firebase-ui-database:3.1.2'
 //    implementation 'com.firebaseui:firebase-ui-database:1.2.0'
+
+    // Google MAPS
+    implementation 'com.google.android.gms:play-services-maps:11.6.2'
+
+    // Auto Complete Place & location
+    implementation 'com.google.android.gms:play-services-places:11.6.2'
+    implementation 'com.google.android.gms:play-services-location:11.6.2'
+
+    // Maps Utils
+    implementation 'com.google.maps.android:android-maps-utils:0.4.4'
+
+
 }
 
 apply plugin: 'com.google.gms.google-services'

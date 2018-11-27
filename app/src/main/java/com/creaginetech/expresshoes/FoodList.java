@@ -444,6 +444,9 @@ public class FoodList extends AppCompatActivity {
             adapter.startListening();
 
         //TOTAL ITEMS DI BOTTOM SHEET
+        //fungsinya ketika pada class foodlist pindah ke CartNew jumlah items pada
+        //halaman CartNew ditambah maka ketika kembali ke halaman FoodList, jumlah items
+        //di bottomsheet terupdate
         cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
         int totalitems = 0;
         for (Order order:cart)

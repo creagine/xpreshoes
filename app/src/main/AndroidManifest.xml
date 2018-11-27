@@ -60,7 +60,7 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".FoodList" />
         <activity android:name=".FoodDetailActivity" />
-        <!--<activity android:name=".CartActivity" />-->
+        <!-- <activity android:name=".CartActivity" /> -->
         <activity android:name=".OrderStatusActivity" />
 
         <service android:name=".Service.MyFirebaseIdService">
@@ -77,7 +77,15 @@
         <activity android:name=".SearchActivity" />
         <activity android:name=".RestaurantList" />
         <activity android:name=".MainNewActivity" />
-        <activity android:name=".CartNewActivity"></activity>
+        <activity android:name=".CartNewActivity" />
+        <activity android:name=".MapsActivity" />
+        <activity android:name=".DirectionActivity" />
+        <activity android:name=".OjekActivity"></activity>
+
+        <service
+            android:name=".network.FetchAddressIntentService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

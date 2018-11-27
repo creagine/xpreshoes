@@ -2,6 +2,7 @@ package com.creaginetech.expresshoes;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -80,13 +81,13 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     DatabaseReference requests;
 
     //VARIABLE VIEWS
-    public TextView txtTotalPrice, txtTotalItems; //public agar bisa dipanggil di cartAdapter
+    public TextView txtTotalPrice, txtTotalItems, txtAlamat; //public agar bisa dipanggil di cartAdapter
     Button btnPlace;
 
     String address;
 
+    //CART ADAPTER
     List<Order> cart = new ArrayList<>();
-
     CartAdapter adapter;
 
     APIService mService;
@@ -133,16 +134,16 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             }
         }
 
-        //Init Service
+        //Init FCM Service
         mService = Common.getFCMService();
 
         rootLayout = (RelativeLayout) findViewById(R.id.rootLayout);
 
-        //Firebase
+        //Firebase DATABASE
         database = FirebaseDatabase.getInstance();
         requests=database.getReference("Restaurants").child(Common.restaurantSelected).child("Requests");
 
-        //Init
+        //Init RECYCLER
         recyclerView = (RecyclerView) findViewById(R.id.listCart);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -152,10 +153,13 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,ItemTouchHelper.LEFT,this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
-        txtTotalPrice = (TextView)findViewById(R.id.total);
+        //init widget
+        txtTotalPrice = findViewById(R.id.total);
         txtTotalItems = findViewById(R.id.totalItemsCart);
-        btnPlace = (Button)findViewById(R.id.btnPlaceOrder);
+        txtAlamat = findViewById(R.id.textViewAlamat);
+        btnPlace = findViewById(R.id.btnPlaceOrder);
 
+        //BUTTON PLACE ORDER
         btnPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -164,6 +168,17 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
                     showAlertDialog();
                 else
                     Toast.makeText(CartNewActivity.this, "Your cart is empty !", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        //BUTTON ALAMAT PENGIRIMAN
+        txtAlamat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(CartNewActivity.this, OjekActivity.class);
+                startActivity(intent);
 
             }
         });
@@ -206,15 +221,17 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     private void showAlertDialog() {
+
+        //BUILD ALERT DIALOG
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle("One more step!");
         alertDialog.setMessage("Enter your address: ");
 
-
+        //INFLATE LAYOUT ORDER ADDRESS
         LayoutInflater inflater = this.getLayoutInflater();
         View order_address_comment = inflater.inflate(R.layout.order_address_comment,null);
 
-//        final MaterialEditText edtAddress = (MaterialEditText)order_address_comment.findViewById(R.id.edtAddress);
+        //final MaterialEditText edtAddress = (MaterialEditText)order_address_comment.findViewById(R.id.edtAddress);
         final PlaceAutocompleteFragment edtAddress = (PlaceAutocompleteFragment)this.getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         //Hide search icon before fragment
         edtAddress.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
@@ -229,7 +246,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         edtAddress.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                shippingAddress=place;
+                shippingAddress = place;
             }
 
             @Override
@@ -239,6 +256,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             }
         });
 
+        //KOLOM COMMENT ADDRESS
         final MaterialEditText edtComment = (MaterialEditText)order_address_comment.findViewById(R.id.edtComment);
 
         //Radio

@@ -184,6 +184,43 @@ public class HomeActivity extends AppCompatActivity {
                                 suggest.add(search);
                         }
                         materialSearchBar.setLastSuggestions(suggest);
+
+                        //Create query by name
+                        Query searchByName = category.orderByChild("name").equalTo(materialSearchBar.getText());
+                        //Create option with query
+                        FirebaseRecyclerOptions<Category> foodOptions = new FirebaseRecyclerOptions.Builder<Category>()
+                                .setQuery(searchByName, Category.class)
+                                .build();
+
+                        searchAdapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(foodOptions) {
+                            @Override
+                            protected void onBindViewHolder(@NonNull MenuViewHolder viewHolder, int position, @NonNull Category model) {
+                                viewHolder.txtMenuName.setText(model.getName());
+                                Picasso.with(getBaseContext()).load(model.getImage())
+                                        .into(viewHolder.imageView);
+
+                                final Category local = model;
+                                viewHolder.setItemClickListener(new ItemClickListener() {
+                                    @Override
+                                    public void onClick(View view, int position, boolean isLongClick) {
+                                        //Start new activity
+                                        Intent foodDetail = new Intent(HomeActivity.this, FoodList.class);
+                                        foodDetail.putExtra("CategoryId", searchAdapter.getRef(position).getKey()); // Send Food Id to new activity
+                                        startActivity(foodDetail);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public MenuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                                View itemView = LayoutInflater.from(parent.getContext())
+                                        .inflate(R.layout.menu_item, parent, false);
+                                return new MenuViewHolder(itemView);
+                            }
+                        };
+                        searchAdapter.startListening();
+                        recycler_menu.setAdapter(searchAdapter); // Set adapter for Recycler View is Search result
+
                     }
 
                     @Override
@@ -260,9 +297,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //Load menu
         recycler_menu = (RecyclerView)findViewById(R.id.recycler_menu);
-        recycler_menu.setHasFixedSize(true);
         recycler_menu.setLayoutManager(new LinearLayoutManager(this)); //grid layout halaman home
-        recycler_menu.setLayoutManager(layoutManager);
 
 
         //to add your token when login app
