@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -42,6 +44,8 @@ import com.creaginetech.expresshoes.Model.Token;
 import com.creaginetech.expresshoes.Remote.APIService;
 import com.creaginetech.expresshoes.ViewHolder.CartAdapter;
 import com.creaginetech.expresshoes.ViewHolder.CartViewHolder;
+import com.creaginetech.expresshoes.network.AppUtils;
+import com.creaginetech.expresshoes.network.FetchAddressIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +56,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -81,8 +90,11 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     DatabaseReference requests;
 
     //VARIABLE VIEWS
-    public TextView txtTotalPrice, txtTotalItems, txtAlamat; //public agar bisa dipanggil di cartAdapter
+    public TextView txtTotalPrice;
+    public TextView txtTotalItems;
+    public TextView txtAlamat; //public agar bisa dipanggil di cartAdapter
     Button btnPlace;
+    RelativeLayout rootLayout;
 
     String address;
 
@@ -94,8 +106,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
     Place shippingAddress;
 
-    RelativeLayout rootLayout;
-
     //Location-cp 36
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
@@ -105,16 +115,24 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     private static final int FATEST_INTERVAL = 3000;
     private static final int DISPLACEMENT = 10;
 
-
     private static final int LOCATION_REQUEST_CODE = 9999;
     private static final int PLAY_SERVICES_REQUEST = 9997;
+
+    /**
+     * Receiver registered with this activity to get the response from FetchAddressIntentService.
+     */
+    private AddressResultReceiver mResultReceiver;
+    /**
+     * The formatted location address.
+     */
+    protected String mSreetOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart_new);
 
-        //Runtime permission - cp 36
+        //Location runtime permission - cp 36
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
@@ -134,7 +152,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             }
         }
 
-        //Init FCM Service
+        //Init FCM Service buat notif
         mService = Common.getFCMService();
 
         rootLayout = (RelativeLayout) findViewById(R.id.rootLayout);
@@ -153,6 +171,9 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,ItemTouchHelper.LEFT,this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
+        //ngambil detail alamat dari recent location
+        mResultReceiver = new AddressResultReceiver(new Handler());
+
         //init widget
         txtTotalPrice = findViewById(R.id.total);
         txtTotalItems = findViewById(R.id.totalItemsCart);
@@ -164,11 +185,26 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void onClick(View view) {
 
-                if (cart.size() > 0)
-                    showAlertDialog();
-                else
-                    Toast.makeText(CartNewActivity.this, "Your cart is empty !", Toast.LENGTH_SHORT).show();
+                if (cart.size() > 0) {
+//                    showAlertDialog();
 
+                    Toast.makeText(CartNewActivity.this,txtAlamat.getText().toString(),Toast.LENGTH_LONG).show();
+
+                    Intent intent = new Intent(CartNewActivity.this, ResultActivity.class);
+
+                    intent.putExtra("phone", Common.currentUser.getPhone());
+                    intent.putExtra("name", Common.currentUser.getName());
+                    intent.putExtra("address", txtAlamat.getText().toString());
+                    intent.putExtra("price", txtTotalPrice.getText().toString());
+                    intent.putExtra("value", "0");
+                    intent.putExtra("location", String.format("%s,%s", mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                    intent.putExtra("restaurant", Common.restaurantSelected);
+
+                    startActivity(intent);
+
+                } else {
+                    Toast.makeText(CartNewActivity.this, "Your cart is empty !", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -262,7 +298,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         //Radio
         final RadioButton radioHomeAddress = (RadioButton) order_address_comment.findViewById(R.id.radioHomeAddress);
 
-        //Event Radio
+        //Event Radio home address
         radioHomeAddress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -308,6 +344,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
                 String order_number = String.valueOf(System.currentTimeMillis());
                 requests.child(order_number)
                         .setValue(request);
+
                 //Delete Cart
                 new Database(getBaseContext()).cleanCart(Common.currentUser.getPhone());
 
@@ -471,6 +508,19 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         if (mLastLocation != null)
         {
             Log.d("LOCATION","Your location : "+mLastLocation.getLatitude()+","+mLastLocation.getLongitude());
+
+            try {
+
+                Location mLocation = new Location("");
+                mLocation.setLatitude(+mLastLocation.getLatitude());
+                mLocation.setLongitude(mLastLocation.getLongitude());
+
+                startIntentService(mLocation);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
         else
         {
@@ -494,6 +544,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         displayLocation();
     }
 
+    //method swipe to delete
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if (viewHolder instanceof CartViewHolder)
@@ -554,4 +605,96 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             snackbar.show();
         }
     }
+
+    //method buat recent location
+    //START
+    /**
+     * Receiver for data sent from FetchAddressIntentService.
+     */
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         * Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            mSreetOutput = resultData.getString(AppUtils.LocationConstants.LOCATION_DATA_STREET);
+            displayAddressOutput();
+
+            // Show a toast message if an address was found.
+            if (resultCode == AppUtils.LocationConstants.SUCCESS_RESULT) {
+                //  showToast(getString(R.string.address_found));
+
+
+            }
+
+
+        }
+
+    }
+
+    protected void displayAddressOutput() {
+        try {
+            if (mSreetOutput != null)
+
+                txtAlamat.setText(mSreetOutput);
+
+            Toast.makeText(CartNewActivity.this,"street " + mSreetOutput,Toast.LENGTH_LONG).show();
+            Toast.makeText(CartNewActivity.this,"alamat " + txtAlamat.getText().toString(),Toast.LENGTH_LONG).show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates an intent, adds location data to it as an extra, and starts the intent service for
+     * fetching an address.
+     */
+    protected void startIntentService(Location mLocation) {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+        // Pass the result receiver as an extra to the service.
+        intent.putExtra(AppUtils.LocationConstants.RECEIVER, mResultReceiver);
+
+        // Pass the location data as an extra to the service.
+        intent.putExtra(AppUtils.LocationConstants.LOCATION_DATA_EXTRA, mLocation);
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        startService(intent);
+    }
+    //END
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        try {
+            mGoogleApiClient.connect();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
 }

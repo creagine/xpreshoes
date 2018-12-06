@@ -80,24 +80,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mLocationMarkerText = (TextView) findViewById(R.id.locationMarkertext);
         mLocationAddress = (EditText) findViewById(R.id.Address);
-//        mLocationText = (TextView) findViewById(R.id.Locality);
-//        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(mToolbar);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//
-//        getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
-
-
-//        mLocationText.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                openAutocompleteActivity();
-//
-//            }
-//
-//
-//        });
 
         mapFragment.getMapAsync(this);
         mResultReceiver = new AddressResultReceiver(new Handler());
@@ -193,13 +175,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-//        mMap.setMyLocationEnabled(true);
-//        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-//
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
     }
 
     @Override
@@ -396,13 +372,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Updates the address in the UI.
      */
     protected void displayAddressOutput() {
-        //  mLocationAddressTextView.setText(mAddressOutput);
         try {
-            if (mAreaOutput != null)
-                // mLocationText.setText(mAreaOutput+ "");
+            if (mSreetOutput != null)
 
                 mLocationAddress.setText(mSreetOutput);
-            //mLocationText.setText(mAreaOutput);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

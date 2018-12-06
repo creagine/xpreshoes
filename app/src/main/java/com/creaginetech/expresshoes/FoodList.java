@@ -50,27 +50,28 @@ import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
 public class FoodList extends AppCompatActivity {
 
+    //variable recycler
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
+    FirebaseRecyclerAdapter<Food, FoodViewHolder> adapter;
 
+    //variable firebase database
     FirebaseDatabase database;
     DatabaseReference foodList;
 
+    //variable category id
     String categoryId = "";
-
-    FirebaseRecyclerAdapter<Food, FoodViewHolder> adapter;
 
     //search Functionality
     FirebaseRecyclerAdapter<Food, FoodViewHolder> searchAdapter;
     List<String> suggestList = new ArrayList<>();
     MaterialSearchBar materialSearchBar;
 
-    //Favorites
+    //local database for cart
     Database localDB;
 
-    //swipe refresh
+    //variable widget
     SwipeRefreshLayout swipeRefreshLayout;
-
     BottomSheetBehavior sheetBehavior;
     LinearLayout layoutBottomSheet;
     TextView txtTotalItems, txtTotalPrice;
@@ -96,13 +97,12 @@ public class FoodList extends AppCompatActivity {
 
         setContentView(R.layout.activity_food_list);
 
-
-        //Firebase
+        //Firebase database
         database = FirebaseDatabase.getInstance();
         foodList = database.getReference("Restaurants").child(Common.restaurantSelected)
                 .child("detail").child("Foods");
 
-        //localDb
+        //local database for cart
         localDB = new Database(this);
 
         //Swipe refresh layout
@@ -111,10 +111,14 @@ public class FoodList extends AppCompatActivity {
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
+        //method ketika di refresh
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 //Get Intent Here
+                //mengambil nilai dari intent sebelumnya
+                //merupakan nilai CategoryId (restorean) yang mewakili untuk menampilkan menu dari
+                //CategoryId / restoran tersebut
                 if (getIntent() != null)
                     categoryId = getIntent().getStringExtra("CategoryId");
                 if (!categoryId.isEmpty() && categoryId != null) {
@@ -202,6 +206,7 @@ public class FoodList extends AppCompatActivity {
             }
         });
 
+        //widget init
         recyclerView = (RecyclerView) findViewById(R.id.recycler_food);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -214,7 +219,6 @@ public class FoodList extends AppCompatActivity {
         txtTotalPrice = findViewById(R.id.totalprice);
 
         sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
-
         sheetBehavior.setState(STATE_HIDDEN);
 
         /**
@@ -248,6 +252,7 @@ public class FoodList extends AppCompatActivity {
             }
         });
 
+        //bottomsheet on click
         layoutBottomSheet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,15 +266,20 @@ public class FoodList extends AppCompatActivity {
 
     }
 
+    //method search
     private void startSearch(CharSequence text) {
+
         //Create query by name
         Query searchByName = foodList.orderByChild("name1").equalTo(text.toString());
+
         //Create option with query
         FirebaseRecyclerOptions<Food> foodOptions = new FirebaseRecyclerOptions.Builder<Food>()
                 .setQuery(searchByName, Food.class)
                 .build();
 
+        //adapter hasil search
         searchAdapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(foodOptions) {
+            //setup viewholder recyclerview hasil search
             @Override
             protected void onBindViewHolder(@NonNull FoodViewHolder viewHolder, int position, @NonNull Food model) {
                 viewHolder.food_name.setText(model.getName1());
@@ -277,6 +287,8 @@ public class FoodList extends AppCompatActivity {
                         .into(viewHolder.food_image);
 
                 final Food local = model;
+
+                //fungsi ketika item pada list makanan diclick
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
@@ -299,6 +311,7 @@ public class FoodList extends AppCompatActivity {
         recyclerView.setAdapter(searchAdapter); // Set adapter for Recycler View is Search result
     }
 
+    //method suggest pada searchbar
     private void loadSuggest() {
         foodList.orderByChild("menuId").equalTo(categoryId)
                 .addValueEventListener(new ValueEventListener() {
@@ -319,6 +332,7 @@ public class FoodList extends AppCompatActivity {
                 });
     }
 
+    //method load list makanan
     private void loadListFood(String categoryId) {
 
         //Create query by category id
@@ -336,8 +350,7 @@ public class FoodList extends AppCompatActivity {
                 Picasso.with(getBaseContext()).load(model.getImage())
                         .into(viewHolder.food_image);
 
-                //Add Quck Cart
-
+                //Add Quick Cart
                 viewHolder.quick_cart.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -362,7 +375,7 @@ public class FoodList extends AppCompatActivity {
 
                         }
 
-                        //TOTAL ITEMS DI BOTTOM SHEET
+                        //UPDATE TOTAL ITEMS DI BOTTOM SHEET
                         cart = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
                         int totalitems = 0;
                         for (Order order:cart)
@@ -404,6 +417,8 @@ public class FoodList extends AppCompatActivity {
                 });
 
                 final Food local = model;
+
+                //fungsi ketika item pada list makanan diclick
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
@@ -439,6 +454,7 @@ public class FoodList extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         //show item in food list when click back from food detail
         if (adapter != null)
             adapter.startListening();
@@ -479,6 +495,8 @@ public class FoodList extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+        //ketika back atau keluar dari suatu restoran maka pesanan pada restoran sebelumnya akan
+        //dihapus dan akan mengulangi pesanan baru lagi setiap memasuki restoran baru
         deletecart();
 
     }

@@ -16,17 +16,15 @@ public class Common {
 
     public static String PHONE_TEXT = "userPhone";
 
-    public static String restaurantSelected="";
+    public static String restaurantSelected = "";
 
     private static final String BASE_URL = "https://fcm.googleapis.com/";
 
-    public static APIService getFCMService()
-    {
+    public static APIService getFCMService() {
         return RetrofitClient.getClient(BASE_URL).create(APIService.class);
     }
 
-    public static String convertCodeToStatus(String code)
-    {
+    public static String convertCodeToStatus(String code) {
         if(code.equals("0"))
             return "Placed";
         else if (code.equals("1"))
@@ -42,9 +40,8 @@ public class Common {
     public static final String USER_KEY = "User";
     public static final String PASSWORD_KEY = "Password";
 
-
-    public static boolean isConnectedToInternet (Context context) // partt 15 check internet connection
-    {
+    // partt 15 check internet connection
+    public static boolean isConnectedToInternet (Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (connectivityManager !=null)

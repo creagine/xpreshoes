@@ -82,6 +82,7 @@ public class HomeActivity extends AppCompatActivity {
 
     TextView txtFullName;
 
+    //var recyclerview category
     RecyclerView recycler_menu;
     RecyclerView.LayoutManager layoutManager;
 
@@ -116,13 +117,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Note: add this code before setContentView method
-//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-//                .setDefaultFontPath("fonts/cf.otf")
-//                .setFontAttrId(R.attr.fontPath)
-//                .build());
-
         setContentView(R.layout.activity_home);
 
         //toolbar

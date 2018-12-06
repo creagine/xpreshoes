@@ -80,12 +80,14 @@
         <activity android:name=".CartNewActivity" />
         <activity android:name=".MapsActivity" />
         <activity android:name=".DirectionActivity" />
-        <activity android:name=".OjekActivity"></activity>
+        <activity android:name=".OjekActivity" />
 
         <service
             android:name=".network.FetchAddressIntentService"
             android:exported="false" />
 
+        <activity android:name=".ResultActivity" />
+        <activity android:name=".ServiceListActivity"></activity>
     </application>
 
 </manifest>

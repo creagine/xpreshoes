@@ -1,11 +1,12 @@
 package com.creaginetech.expresshoes.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,19 +17,17 @@ import android.widget.Toast;
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.HomeActivity;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
-import com.creaginetech.expresshoes.Model.Restaurant;
+import com.creaginetech.expresshoes.Model.Shop;
 import com.creaginetech.expresshoes.R;
-import com.creaginetech.expresshoes.RestaurantList;
-import com.creaginetech.expresshoes.ViewHolder.RestaurantViewHolder;
+import com.creaginetech.expresshoes.ServiceListActivity;
+import com.creaginetech.expresshoes.ViewHolder.ShopViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
-public class HomeFragment extends Fragment {
-
-    //var alert dialog
-    AlertDialog waitingDialog;
+//gantinya homefragment, udah pake model shop
+public class HomeNewFragment extends Fragment {
 
     //var recycler
     RecyclerView recyclerView;
@@ -36,16 +35,18 @@ public class HomeFragment extends Fragment {
     //var refresf layout
     SwipeRefreshLayout swipeRefreshLayout;
 
+    //firebase recycler adapter
+    FirebaseRecyclerAdapter<Shop,ShopViewHolder> adapter;
 
-    FirebaseRecyclerAdapter<Restaurant,RestaurantViewHolder> adapter;
-
-    public HomeFragment() {
+    public HomeNewFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -95,38 +96,37 @@ public class HomeFragment extends Fragment {
         recyclerView = (RecyclerView)view.findViewById(R.id.recycler_restaurant);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //grid layout halaman home
 
-        return view;
+    return view;
     }
-
 
     //method load resto
     private void loadRestaurant() {
 
         //firebase recycler, model RESTAURANT
-        FirebaseRecyclerOptions<Restaurant> options = new FirebaseRecyclerOptions.Builder<Restaurant>()
+        FirebaseRecyclerOptions<Shop> options = new FirebaseRecyclerOptions.Builder<Shop>()
                 .setQuery(FirebaseDatabase.getInstance()
                                 .getReference()
                                 .child("Restaurants")
-                        ,Restaurant.class)
+                        ,Shop.class)
                 .build();
 
-        adapter = new FirebaseRecyclerAdapter<Restaurant, RestaurantViewHolder>(options) {
+        adapter = new FirebaseRecyclerAdapter<Shop, ShopViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull RestaurantViewHolder viewHolder, int position, @NonNull Restaurant model) {
+            protected void onBindViewHolder(@NonNull ShopViewHolder viewHolder, int position, @NonNull Shop model) {
 
-                viewHolder.txt_restaurant_name.setText(model.getName());
+                viewHolder.txt_shop_name.setText(model.getName());
 
                 Picasso.with(getActivity().getBaseContext()).load(model.getImage())
-                        .into(viewHolder.img_restaurant);
+                        .into(viewHolder.img_shop);
 
-                final Restaurant clickItem = model;
+                final Shop clickItem = model;
 
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
 
                         //Get CategoryId and send to new Activity
-                        Intent foodList = new Intent(getActivity(), HomeActivity.class);
+                        Intent foodList = new Intent(getActivity(), ServiceListActivity.class);
 
                         //When user select restaurant, we will save restaurant id to select category of this restaurant
                         Common.restaurantSelected = adapter.getRef(position).getKey();
@@ -138,10 +138,10 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public RestaurantViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public ShopViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.restaurant_item, parent, false);
-                return new RestaurantViewHolder(itemView);
+                        .inflate(R.layout.shop_item, parent, false);
+                return new ShopViewHolder(itemView);
             }
         };
 

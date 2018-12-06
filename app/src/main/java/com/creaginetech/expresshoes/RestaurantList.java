@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+//ga kepake
 public class RestaurantList extends AppCompatActivity {
 
     AlertDialog waitingDialog;
