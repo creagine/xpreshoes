@@ -2,18 +2,16 @@ package com.creaginetech.expresshoes.Model;
 
 //pengganti class Food
 public class Service {
-    private String serviceName, image, description, price, discount, serviceId;
+    private String serviceName, serviceImage, description, price;
 
     public Service() {
     }
 
-    public Service(String serviceName, String image, String description, String price, String discount, String serviceId) {
+    public Service(String serviceName, String serviceImage, String description, String price) {
         this.serviceName = serviceName;
-        this.image = image;
+        this.serviceImage = serviceImage;
         this.description = description;
         this.price = price;
-        this.discount = discount;
-        this.serviceId = serviceId;
     }
 
     public String getServiceName() {
@@ -24,12 +22,12 @@ public class Service {
         this.serviceName = serviceName;
     }
 
-    public String getImage() {
-        return image;
+    public String getServiceImage() {
+        return serviceImage;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setServiceImage(String serviceImage) {
+        this.serviceImage = serviceImage;
     }
 
     public String getDescription() {
@@ -46,21 +44,5 @@ public class Service {
 
     public void setPrice(String price) {
         this.price = price;
-    }
-
-    public String getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(String discount) {
-        this.discount = discount;
-    }
-
-    public String getServiceId() {
-        return serviceId;
-    }
-
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
     }
 }

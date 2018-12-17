@@ -53,7 +53,7 @@ public class HomeNewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_new, container, false);
 
         //View - cp-28 (Refresh layout)
         swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.swipe_layout);
@@ -66,8 +66,8 @@ public class HomeNewFragment extends Fragment {
             public void onRefresh() {
                 if(Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
 
-                    //load list resto
-                    loadRestaurant();
+                    //load list shop
+                    loadShop();
 
                 else {
                     Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
@@ -82,8 +82,8 @@ public class HomeNewFragment extends Fragment {
             public void run() {
                 if(Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
 
-                    //load list resto
-                    loadRestaurant();
+                    //load list shop
+                    loadShop();
 
                 else {
                     Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
@@ -92,31 +92,31 @@ public class HomeNewFragment extends Fragment {
             }
         });
 
-        //init recycler restaurant
-        recyclerView = (RecyclerView)view.findViewById(R.id.recycler_restaurant);
+        //init recycler shop
+        recyclerView = view.findViewById(R.id.recycler_shop);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //grid layout halaman home
 
     return view;
     }
 
-    //method load resto
-    private void loadRestaurant() {
+    //method load shop
+    private void loadShop() {
 
-        //firebase recycler, model RESTAURANT
+        //firebase recycler, model Shop
         FirebaseRecyclerOptions<Shop> options = new FirebaseRecyclerOptions.Builder<Shop>()
                 .setQuery(FirebaseDatabase.getInstance()
                                 .getReference()
-                                .child("Restaurants")
+                                .child("shop")
                         ,Shop.class)
                 .build();
 
+        //recycler adapter shop - ShopViewHolder
         adapter = new FirebaseRecyclerAdapter<Shop, ShopViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull ShopViewHolder viewHolder, int position, @NonNull Shop model) {
 
-                viewHolder.txt_shop_name.setText(model.getName());
-
-                Picasso.with(getActivity().getBaseContext()).load(model.getImage())
+                viewHolder.txt_shop_name.setText(model.getShopName());
+                Picasso.with(getActivity().getBaseContext()).load(model.getShopImage())
                         .into(viewHolder.img_shop);
 
                 final Shop clickItem = model;
@@ -126,12 +126,12 @@ public class HomeNewFragment extends Fragment {
                     public void onClick(View view, int position, boolean isLongClick) {
 
                         //Get CategoryId and send to new Activity
-                        Intent foodList = new Intent(getActivity(), ServiceListActivity.class);
+                        Intent serviceList = new Intent(getActivity(), ServiceListActivity.class);
 
-                        //When user select restaurant, we will save restaurant id to select category of this restaurant
+                        //When user select shop, we will save shop id to select service of this shop
                         Common.restaurantSelected = adapter.getRef(position).getKey();
 
-                        startActivity(foodList);
+                        startActivity(serviceList);
 
                     }
                 });
@@ -162,7 +162,7 @@ public class HomeNewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //show item in food list when click back from food detail
+        //show item in service list when click back from service detail
         if (adapter != null)
             adapter.startListening();
     }

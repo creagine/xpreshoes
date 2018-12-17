@@ -1,8 +1,5 @@
 package com.creaginetech.expresshoes;
 
-import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +14,9 @@ import com.andremion.counterfab.CounterFab;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Database.Database;
-import com.creaginetech.expresshoes.Model.Food;
 import com.creaginetech.expresshoes.Model.Order;
 import com.creaginetech.expresshoes.Model.Rating;
+import com.creaginetech.expresshoes.Model.Service;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,51 +29,34 @@ import com.stepstone.apprating.listener.RatingDialogListener;
 
 import java.util.Arrays;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+//pengganti class foodDetailActivity
+public class ServiceDetailActivity extends AppCompatActivity implements RatingDialogListener {
 
-public class FoodDetailActivity extends AppCompatActivity implements RatingDialogListener{
-
-    TextView food_name,food_price,food_description;
-    ImageView food_image;
+    TextView service_name,service_price,service_description;
+    ImageView service_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
     FloatingActionButton btnRating;
     CounterFab btnCart;
     ElegantNumberButton numberButton;
     RatingBar ratingBar;
 
-    String foodId="";
+    String serviceId="";
 
     FirebaseDatabase database;
-    DatabaseReference foods;
+    DatabaseReference service;
     DatabaseReference ratingTbl;
 
-    Food currentFood;
-
-    //calligraphy
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
+    Service currentService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Note: add this code before setContentView method
-//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-//                .setDefaultFontPath("fonts/cf.otf")
-//                .setFontAttrId(R.attr.fontPath)
-//                .build());
-
-
-        setContentView(R.layout.activity_food_detail);
+        setContentView(R.layout.activity_service_detail);
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        foods = database.getReference("Restaurants").child(Common.restaurantSelected)
-                .child("detail").child("Foods");
+        service = database.getReference("shop").child(Common.restaurantSelected)
+                .child("detail").child("service");
         ratingTbl = database.getReference("Rating");
 
         //Init View
@@ -98,27 +78,26 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
             public void onClick(View view) {
                 new Database(getBaseContext()).addToCart(new Order(
                         Common.currentUser.getPhone(),
-                        foodId,
-                        currentFood.getName1(),
+                        serviceId,
+                        currentService.getServiceName(),
                         numberButton.getNumber(),
-                        currentFood.getPrice(),
-                        currentFood.getImage()
+                        currentService.getPrice(),
+                        currentService.getServiceImage()
 
 
 
                 ));
 
-                Toast.makeText(FoodDetailActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ServiceDetailActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnCart.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
 
-
-        food_description = (TextView)findViewById(R.id.food_description);
-        food_name = (TextView)findViewById(R.id.food_name);
-        food_price = (TextView)findViewById(R.id.food_price);
-        food_image = (ImageView)findViewById(R.id.img_food);
+        service_description = (TextView)findViewById(R.id.service_description);
+        service_name = (TextView)findViewById(R.id.service_name);
+        service_price = (TextView)findViewById(R.id.service_price);
+        service_image = (ImageView)findViewById(R.id.img_service);
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
@@ -126,23 +105,22 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
 
         //Get Food Id from Intent
         if (getIntent() != null)
-            foodId = getIntent().getStringExtra("FoodId");
-        if (!foodId.isEmpty())
+            serviceId = getIntent().getStringExtra("serviceId");
+        if (!serviceId.isEmpty())
         {
             if (Common.isConnectedToInternet(getBaseContext()))
             {
-                getDetailFood(foodId);
-                getRatingFood(foodId);
+                getDetailService(serviceId);
+                getRatingService(serviceId);
             }
             else {
-                Toast.makeText(FoodDetailActivity.this, "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
-                return;
+                Toast.makeText(ServiceDetailActivity.this, "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
             }
         }
     }
 
-    private void getRatingFood(String foodId) {
-        Query foodRating = ratingTbl.orderByChild("foodId").equalTo(foodId);
+    private void getRatingService(String serviceId) {
+        Query foodRating = ratingTbl.orderByChild("foodId").equalTo(serviceId);
 
         foodRating.addValueEventListener(new ValueEventListener() {
             int count=0,sum=0;
@@ -184,27 +162,27 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                 .setCommentTextColor(android.R.color.white)
                 .setCommentBackgroundColor(R.color.colorPrimaryDark)
                 .setWindowAnimation(R.style.RatingDialogFadeAnim)
-                .create(FoodDetailActivity.this)
+                .create(ServiceDetailActivity.this)
                 .show();
     }
 
-    private void getDetailFood(String foodId) {
-        foods.child(foodId).addValueEventListener(new ValueEventListener() {
+    private void getDetailService(String serviceId) {
+        service.child(serviceId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                currentFood = dataSnapshot.getValue(Food.class);
+                currentService = dataSnapshot.getValue(Service.class);
 
                 //Set Image
-                Picasso.with(getBaseContext()).load(currentFood.getImage())
-                        .into(food_image);
+                Picasso.with(getBaseContext()).load(currentService.getServiceImage())
+                        .into(service_image);
 
-                collapsingToolbarLayout.setTitle(currentFood.getName1());
+                collapsingToolbarLayout.setTitle(currentService.getServiceName());
 
-                food_price.setText(currentFood.getPrice());
+                service_price.setText(currentService.getPrice());
 
-                food_name.setText(currentFood.getName1());
+                service_name.setText(currentService.getServiceName());
 
-                food_description.setText(currentFood.getDescription());
+                service_description.setText(currentService.getDescription());
             }
 
             @Override
@@ -224,7 +202,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
     public void onPositiveButtonClicked(int value, String comments) {
         //Get Rating and Upload to firebase
         final Rating rating = new Rating(Common.currentUser.getPhone(),
-                foodId,
+                serviceId,
                 String.valueOf(value),
                 comments);
         ratingTbl.child(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
@@ -243,7 +221,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                     //Update new value
                     ratingTbl.child(Common.currentUser.getPhone()).setValue(rating);
                 }
-                Toast.makeText(FoodDetailActivity.this, "Thank you for submit rating !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ServiceDetailActivity.this, "Thank you for submit rating !", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -253,4 +231,5 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
         });
 
     }
+
 }

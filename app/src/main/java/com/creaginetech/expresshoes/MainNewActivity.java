@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import com.creaginetech.expresshoes.Fragment.AccountFragment;
 //import com.creaginetech.expresshoes.Fragment.CartFragment;
 import com.creaginetech.expresshoes.Fragment.HomeFragment;
+import com.creaginetech.expresshoes.Fragment.HomeNewFragment;
 import com.creaginetech.expresshoes.Fragment.TransactionFragment;
 import com.creaginetech.expresshoes.Helper.BottomNavigationViewHelper;
 
@@ -38,7 +39,7 @@ public class MainNewActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //load fragment default (HomeFragment)
-        loadFragment(new HomeFragment());
+        loadFragment(new HomeNewFragment());
 
         //hilangkan animasi bottomnav
         BottomNavigationViewHelper.removeShiftMode(navigation);
@@ -54,7 +55,7 @@ public class MainNewActivity extends AppCompatActivity {
             Fragment fragment;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = new HomeFragment();
+                    fragment = new HomeNewFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_transactions:

@@ -3,29 +3,29 @@ package com.creaginetech.expresshoes.Model;
 //pengganti restaurant
 public class Shop {
 
-    private String name,image;
+    private String shopName,shopImage;
 
     public Shop() {
     }
 
-    public Shop(String name, String image) {
-        this.name = name;
-        this.image = image;
+    public Shop(String shopName, String shopImage) {
+        this.shopName = shopName;
+        this.shopImage = shopImage;
     }
 
-    public String getName() {
-        return name;
+    public String getShopName() {
+        return shopName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 
-    public String getImage() {
-        return image;
+    public String getShopImage() {
+        return shopImage;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setShopImage(String shopImage) {
+        this.shopImage = shopImage;
     }
 }

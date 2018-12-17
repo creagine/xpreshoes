@@ -161,7 +161,6 @@ public class SearchActivity extends AppCompatActivity {
                                     model.getName1(),
                                     "1",
                                     model.getPrice(),
-                                    model.getDiscount(),
                                     model.getImage()
 
                             ));

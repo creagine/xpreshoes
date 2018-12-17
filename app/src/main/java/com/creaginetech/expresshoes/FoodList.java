@@ -262,8 +262,6 @@ public class FoodList extends AppCompatActivity {
             }
         });
 
-
-
     }
 
     //method search
@@ -365,7 +363,6 @@ public class FoodList extends AppCompatActivity {
                                     model.getName1(),
                                     "1",
                                     model.getPrice(),
-                                    model.getDiscount(),
                                     model.getImage()
 
                             ));

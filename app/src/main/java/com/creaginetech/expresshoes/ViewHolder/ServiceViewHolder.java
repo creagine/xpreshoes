@@ -19,14 +19,14 @@ public class ServiceViewHolder extends RecyclerView.ViewHolder implements View.O
         this.itemClickListener = itemClickListener;
     }
 
-    public FoodViewHolder(View itemView) {
+    public ServiceViewHolder(View itemView) {
         super(itemView);
 
         //edit sesuaikan service_item
-        serviceName = (TextView)itemView.findViewById(R.id.food_name);
-        serviceImage = (ImageView)itemView.findViewById(R.id.food_image);
+        serviceName = (TextView)itemView.findViewById(R.id.service_name);
+        serviceImage = (ImageView)itemView.findViewById(R.id.service_image);
         fav_image = (ImageView)itemView.findViewById(R.id.fav);
-        servicePrice = (TextView) itemView.findViewById(R.id.food_price);
+        servicePrice = (TextView) itemView.findViewById(R.id.service_price);
         quick_cart = (ImageView)itemView.findViewById(R.id.btn_quick_cart);
 
         itemView.setOnClickListener(this);
