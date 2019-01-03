@@ -8,7 +8,8 @@ public class Request {
     private String address;
     private String total;
     private String status;
-    private String comment;
+    //sementara comment dihilangin
+//    private String comment;
     private String latLng;
     private String restaurantId;
     private List<Order> foods; // list of food order
@@ -16,17 +17,28 @@ public class Request {
     public Request() {
     }
 
-    public Request(String phone, String name, String address, String total, String status, String comment, String latLng, String restaurantId, List<Order> foods) {
+    public Request(String phone, String name, String address, String total, String status, String latLng, String restaurantId, List<Order> foods) {
         this.phone = phone;
         this.name = name;
         this.address = address;
         this.total = total;
         this.status = status;
-        this.comment = comment;
         this.latLng = latLng;
         this.restaurantId = restaurantId;
         this.foods = foods;
     }
+
+    //    public Request(String phone, String name, String address, String total, String status, String comment, String latLng, String restaurantId, List<Order> foods) {
+//        this.phone = phone;
+//        this.name = name;
+//        this.address = address;
+//        this.total = total;
+//        this.status = status;
+//        this.comment = comment;
+//        this.latLng = latLng;
+//        this.restaurantId = restaurantId;
+//        this.foods = foods;
+//    }
 
     public String getPhone() {
         return phone;
@@ -68,13 +80,13 @@ public class Request {
         this.status = status;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
+//    public String getComment() {
+//        return comment;
+//    }
+//
+//    public void setComment(String comment) {
+//        this.comment = comment;
+//    }
 
     public String getLatLng() {
         return latLng;

@@ -79,8 +79,7 @@ public class ServiceListActivity extends AppCompatActivity {
 
         //Firebase database
         database = FirebaseDatabase.getInstance();
-        serviceList = database.getReference("shop").child(Common.restaurantSelected)
-                .child("detail").child("service");
+        serviceList = database.getReference("service").child(Common.restaurantSelected); //EDIT THIS
 
         //local database for cart
         localDB = new Database(this);
@@ -305,10 +304,7 @@ public class ServiceListActivity extends AppCompatActivity {
 
         //firebase recycler, model Shop
         FirebaseRecyclerOptions<Service> options = new FirebaseRecyclerOptions.Builder<Service>()
-                .setQuery(FirebaseDatabase.getInstance()
-                                .getReference()
-                                .child("shop").child(Common.restaurantSelected)
-                                .child("detail").child("service")
+                .setQuery(serviceList
                         ,Service.class)
                 .build();
 

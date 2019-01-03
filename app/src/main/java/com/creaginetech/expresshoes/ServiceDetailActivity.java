@@ -55,8 +55,7 @@ public class ServiceDetailActivity extends AppCompatActivity implements RatingDi
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        service = database.getReference("shop").child(Common.restaurantSelected)
-                .child("detail").child("service");
+        service = database.getReference("service").child(Common.restaurantSelected);
         ratingTbl = database.getReference("Rating");
 
         //Init View

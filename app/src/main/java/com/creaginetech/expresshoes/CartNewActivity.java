@@ -87,7 +87,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
     //VARIABLE FIREBASE DATABASE
     FirebaseDatabase database;
-    DatabaseReference requests;
+    DatabaseReference requestReference;
 
     //VARIABLE VIEWS
     public TextView txtTotalPrice;
@@ -103,8 +103,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     CartAdapter adapter;
 
     APIService mService;
-
-    Place shippingAddress;
 
     //Location-cp 36
     private LocationRequest mLocationRequest;
@@ -155,14 +153,14 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         //Init FCM Service buat notif
         mService = Common.getFCMService();
 
-        rootLayout = (RelativeLayout) findViewById(R.id.rootLayout);
+        rootLayout = findViewById(R.id.rootLayout);
 
         //Firebase DATABASE
         database = FirebaseDatabase.getInstance();
-        requests=database.getReference("Restaurants").child(Common.restaurantSelected).child("Requests");
+        requestReference = database.getReference("order").child(Common.restaurantSelected);
 
         //Init RECYCLER
-        recyclerView = (RecyclerView) findViewById(R.id.listCart);
+        recyclerView = findViewById(R.id.listCart);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -186,21 +184,29 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             public void onClick(View view) {
 
                 if (cart.size() > 0) {
-//                    showAlertDialog();
 
-                    Toast.makeText(CartNewActivity.this,txtAlamat.getText().toString(),Toast.LENGTH_LONG).show();
+                    //Create new request
+                    Request request = new Request(
+                            Common.currentUser.getPhone(),
+                            Common.currentUser.getName(),
+                            txtAlamat.getText().toString(),
+                            txtTotalPrice.getText().toString(),
+                            "0", // status
+                            String.format("%s,%s",mLastLocation.getLatitude(),mLastLocation.getLongitude()),
+                            Common.restaurantSelected,
+                            cart
+                    );
 
-                    Intent intent = new Intent(CartNewActivity.this, ResultActivity.class);
+                    //Submit to Firebase
+                    //We will using System.CurrentMilli to key
+                    String order_number = String.valueOf(System.currentTimeMillis());
+                    requestReference.child(order_number)
+                            .setValue(request);
 
-                    intent.putExtra("phone", Common.currentUser.getPhone());
-                    intent.putExtra("name", Common.currentUser.getName());
-                    intent.putExtra("address", txtAlamat.getText().toString());
-                    intent.putExtra("price", txtTotalPrice.getText().toString());
-                    intent.putExtra("value", "0");
-                    intent.putExtra("location", String.format("%s,%s", mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                    intent.putExtra("restaurant", Common.restaurantSelected);
-
-                    startActivity(intent);
+                    //Delete Cart
+                new Database(getBaseContext()).cleanCart(Common.currentUser.getPhone());
+                    Toast.makeText(CartNewActivity.this, "Thank you , Order Placed", Toast.LENGTH_SHORT).show();
+                finish();
 
                 } else {
                     Toast.makeText(CartNewActivity.this, "Your cart is empty !", Toast.LENGTH_SHORT).show();
@@ -254,130 +260,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             return false;
         }
         return true;
-    }
-
-    private void showAlertDialog() {
-
-        //BUILD ALERT DIALOG
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        alertDialog.setTitle("One more step!");
-        alertDialog.setMessage("Enter your address: ");
-
-        //INFLATE LAYOUT ORDER ADDRESS
-        LayoutInflater inflater = this.getLayoutInflater();
-        View order_address_comment = inflater.inflate(R.layout.order_address_comment,null);
-
-        //final MaterialEditText edtAddress = (MaterialEditText)order_address_comment.findViewById(R.id.edtAddress);
-        final PlaceAutocompleteFragment edtAddress = (PlaceAutocompleteFragment)this.getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-        //Hide search icon before fragment
-        edtAddress.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE);
-        //set hint for autocomplete edit text
-        ((EditText)edtAddress.getView().findViewById(R.id.place_autocomplete_search_input))
-                .setHint("Enter your address");
-        //set text size
-        ((EditText)edtAddress.getView().findViewById(R.id.place_autocomplete_search_input))
-                .setTextSize(14);
-
-        //Get Address from place autocomplete
-        edtAddress.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                shippingAddress = place;
-            }
-
-            @Override
-            public void onError(Status status) {
-                Log.e("ERROR",status.getStatusMessage());
-
-            }
-        });
-
-        //KOLOM COMMENT ADDRESS
-        final MaterialEditText edtComment = (MaterialEditText)order_address_comment.findViewById(R.id.edtComment);
-
-        //Radio
-        final RadioButton radioHomeAddress = (RadioButton) order_address_comment.findViewById(R.id.radioHomeAddress);
-
-        //Event Radio home address
-        radioHomeAddress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                {
-                    if (Common.currentUser.getHomeAddress() != null ||
-                            !TextUtils.isEmpty(Common.currentUser.getHomeAddress()))
-                    {
-                        address = Common.currentUser.getHomeAddress();
-                        ((EditText) edtAddress.getView().findViewById(R.id.place_autocomplete_search_input))
-                                .setText(address);
-                    }
-                    else
-                    {
-                        Toast.makeText(CartNewActivity.this, "Please update your Home Address", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-            }
-        });
-
-        alertDialog.setView(order_address_comment);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
-
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //Create new request
-                Request request = new Request(
-                        Common.currentUser.getPhone(),
-                        Common.currentUser.getName(),
-                        shippingAddress.getAddress().toString(),
-                        txtTotalPrice.getText().toString(),
-                        "0", // status
-                        edtComment.getText().toString(),
-                        String.format("%s,%s",shippingAddress.getLatLng().latitude,shippingAddress.getLatLng().longitude),
-                        Common.restaurantSelected,
-                        cart
-                );
-
-                //Submit to Firebase
-                //We will using System.CurrentMilli to key
-                String order_number = String.valueOf(System.currentTimeMillis());
-                requests.child(order_number)
-                        .setValue(request);
-
-                //Delete Cart
-                new Database(getBaseContext()).cleanCart(Common.currentUser.getPhone());
-
-                sendNotificationOrder(order_number);
-
-//                Toast.makeText(CartActivity.this, "Thank you , Order Place", Toast.LENGTH_SHORT).show();
-//                finish();
-
-
-                //Remove fragment agar tidak crash saat order lagi
-                getFragmentManager().beginTransaction()
-                        .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
-                        .commit();
-
-
-            }
-        });
-
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-
-                //Remove fragment agar tidak crash saat order lagi
-                getFragmentManager().beginTransaction()
-                        .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
-                        .commit();
-
-
-            }
-        });
-
-        alertDialog.show();
     }
 
     @Override

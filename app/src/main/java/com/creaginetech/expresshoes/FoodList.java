@@ -335,6 +335,7 @@ public class FoodList extends AppCompatActivity {
 
         //Create query by category id
         Query searchByName = foodList.orderByChild("menuId").equalTo(categoryId);
+
         //Create option with query
         FirebaseRecyclerOptions<Food> foodOptions = new FirebaseRecyclerOptions.Builder<Food>()
                 .setQuery(searchByName, Food.class)
