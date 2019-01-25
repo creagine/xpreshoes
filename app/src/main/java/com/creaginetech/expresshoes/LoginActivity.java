@@ -3,94 +3,107 @@ package com.creaginetech.expresshoes;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.Profile;
-import com.facebook.ProfileTracker;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Arrays;
+import com.creaginetech.expresshoes.Common.Common;
+import com.creaginetech.expresshoes.Model.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private EditText editText;
+    private Button btnContinue;
 
-    CallbackManager callbackManager;
+    private FirebaseAuth mAuth;
+    private DatabaseReference usersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        callbackManager = CallbackManager.Factory.create();
-        this.setTitle("Login");
-        LoginButton loginButton = (LoginButton)findViewById(R.id.login_button);
 
+        usersRef = FirebaseDatabase.getInstance().getReference("Users");
 
+        //check jika user sdh login langsung masuk mainNewActivity
+        checkCurrentUser();
 
-        loginButton.setReadPermissions(Arrays.asList("email","public_profile"));
-        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+        editText = findViewById(R.id.editTextPhone);
+        btnContinue = findViewById(R.id.buttonContinue);
+
+        editText.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
 
-            }
-        };
-        ProfileTracker profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                    btnContinue.performClick();
 
-            }
-        };
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                AccessToken accessToken = loginResult.getAccessToken();
-                Profile profile = Profile.getCurrentProfile();
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                Log.e("aa", ""+response.toString());
-                                try {
-                                    Toast.makeText(getApplicationContext(), "Hi, " + object.getString("name"), Toast.LENGTH_LONG).show();
-                                } catch(JSONException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                Toast.makeText(getApplication(), "cancel login", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Toast.makeText(getApplication(), "error login", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
             }
         });
+
+        btnContinue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String code = "62";
+
+                String number = editText.getText().toString().trim();
+
+                if (number.isEmpty() || number.length() < 10) {
+                    editText.setError("Valid number is required");
+                    editText.requestFocus();
+                    return;
+                }
+
+                String phoneNumber = "+" + code + number;
+
+                Intent intent = new Intent(LoginActivity.this, VerifyPhoneActivity.class);
+                intent.putExtra("phonenumber", phoneNumber);
+                startActivity(intent);
+            }
+        });
+
     }
 
+    private void checkCurrentUser() {
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        //Get Firebase auth instance
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+
+            String userPhone = mAuth.getCurrentUser().getPhoneNumber();
+
+            usersRef.child(userPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            User localUser = dataSnapshot.getValue(User.class);
+
+                            Common.currentUser = localUser;
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+            Intent homeIntent = new Intent(LoginActivity.this, MainNewActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
 
     }
 }

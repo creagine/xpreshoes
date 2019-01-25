@@ -57,12 +57,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Note: add this code before setContentView method
-//        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-//                .setDefaultFontPath("fonts/cf.otf")
-//                .setFontAttrId(R.attr.fontPath)
-//                .build());
-
         AccountKit.initialize(this);
         setContentView(R.layout.activity_main);
 
@@ -70,15 +64,11 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         users = database.getReference("User");
 
-
-
         btnContinue = (Button)findViewById(R.id.btn_continue);
 
         txtSlogan = (TextView)findViewById(R.id.txtSlogan);
         Typeface face = Typeface.createFromAsset(getAssets(),"fonts/Nabila.ttf");
         txtSlogan.setTypeface(face);
-
-
 
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,61 +130,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(AccountKitActivity.ACCOUNT_KIT_ACTIVITY_CONFIGURATION,configurationBuilder.build());
         startActivityForResult(intent,REQUEST_CODE);
     }
-
-//    private void loginremember(final String phone, final String pwd) {
-//        //copy login code from signin.class
-//
-//        //Init Firebase
-//        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        final DatabaseReference table_user = database.getReference("User");
-//
-//        if (Common.isConnectedToInternet(getBaseContext())) {
-//
-//            //part cek internet connection
-//            final ProgressDialog mDialog = new ProgressDialog(MainActivity.this);
-//            mDialog.setMessage("Please waiting....");
-//            mDialog.show();
-//
-//            table_user.addValueEventListener(new ValueEventListener() {
-//
-//
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                    //Check if user no exist in database
-//                    if (dataSnapshot.child(phone).exists()) {
-//                        //Get User Information
-//                        mDialog.dismiss();
-//                        User user = dataSnapshot.child(phone).getValue(User.class);
-//                        user.setPhone(phone);
-//                        if (user.getPassword().equals(pwd)) {
-//                            {
-//                                Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
-//                                Common.currentUser = user;
-//                                startActivity(homeIntent);
-//                                finish();
-//                            }
-//                        } else {
-//                            Toast.makeText(MainActivity.this, "Wrong Password !!!", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } else {
-//                        mDialog.dismiss();
-//                        Toast.makeText(MainActivity.this, "User no exist in Database", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//        }
-//        else
-//        {
-//            Toast.makeText(MainActivity.this, "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
-//            return;
-//        }
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

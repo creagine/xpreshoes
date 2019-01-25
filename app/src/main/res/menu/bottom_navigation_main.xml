@@ -8,17 +8,10 @@
         android:title="Home"
         app:showAsAction="always" />
     <item
-        android:id="@+id/navigation_transactions"
+        android:id="@+id/navigation_orders"
         android:enabled="true"
         android:icon="@drawable/ic_transaction_24dp"
-        android:title="Transactions"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/navigation_cart"
-        android:enabled="true"
-        android:icon="@drawable/ic_shopping_cart_24dp"
-        android:title="Cart"
-        android:visible="false"
+        android:title="Orders"
         app:showAsAction="always" />
     <item
         android:id="@+id/navigation_account"

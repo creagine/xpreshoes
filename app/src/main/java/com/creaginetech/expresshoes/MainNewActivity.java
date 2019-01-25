@@ -5,15 +5,15 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.creaginetech.expresshoes.Fragment.AccountFragment;
 //import com.creaginetech.expresshoes.Fragment.CartFragment;
-import com.creaginetech.expresshoes.Fragment.HomeFragment;
 import com.creaginetech.expresshoes.Fragment.HomeNewFragment;
-import com.creaginetech.expresshoes.Fragment.TransactionFragment;
+import com.creaginetech.expresshoes.Fragment.OrderFragment;
 import com.creaginetech.expresshoes.Helper.BottomNavigationViewHelper;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -58,18 +58,18 @@ public class MainNewActivity extends AppCompatActivity {
                     fragment = new HomeNewFragment();
                     loadFragment(fragment);
                     return true;
-                case R.id.navigation_transactions:
-                    fragment = new TransactionFragment();
+                case R.id.navigation_orders:
+                    fragment = new OrderFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_account:
                     fragment = new AccountFragment();
                     loadFragment(fragment);
                     return true;
-                case R.id.navigation_cart:
+//                case R.id.navigation_cart:
 //                    fragment = new CartFragment();
 //                    loadFragment(fragment);
-                    return true;
+//                    return true;
             }
 
             return false;
@@ -85,5 +85,11 @@ public class MainNewActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    @Override
+    public void onBackPressed() {
+            super.onBackPressed();
+            finishAffinity();
+        }
 
 }

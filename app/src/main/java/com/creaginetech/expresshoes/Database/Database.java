@@ -23,8 +23,7 @@ public class Database extends SQLiteAssetHelper{
         super(context, DB_NAME,null, DB_VER);
     }
 
-    public boolean checkFoodExists (String foodId,String userPhone)
-    {
+    public boolean checkFoodExists (String foodId,String userPhone) {
         boolean flag = false;
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
@@ -38,8 +37,7 @@ public class Database extends SQLiteAssetHelper{
         return flag;
     }
 
-    public List<Order> getCarts(String userPhone)
-    {
+    public List<Order> getCarts(String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
@@ -68,8 +66,7 @@ public class Database extends SQLiteAssetHelper{
     }
 
 
-    public void addToCart(Order order)
-    {
+    public void addToCart(Order order) {
         SQLiteDatabase db = getReadableDatabase();
         String query = String.format("INSERT OR REPLACE INTO OrderDetail(UserPhone,ProductId,ProductName,Quantity,Price,Image) VALUES('%s','%s','%s','%s','%s','%s');",
                 order.getUserPhone(),
@@ -81,8 +78,7 @@ public class Database extends SQLiteAssetHelper{
         db.execSQL(query);
     }
 
-    public void cleanCart(String userPhone)
-    {
+    public void cleanCart(String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
         String query = String.format("DELETE FROM OrderDetail WHERE UserPhone='%s'",userPhone);
 
@@ -124,20 +120,19 @@ public class Database extends SQLiteAssetHelper{
     }
 
     //Favorites (Update or delete favorites item)
-    public void addToFavorites(String foodId,String userPhone)
-    {
+    public void addToFavorites(String foodId,String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
         String query = String.format("INSERT INTO Favorites(FoodId,UserPhone) VALUES('%s','%s');",foodId,userPhone);
         db.execSQL(query);
     }
-    public void removeFromFavorites(String foodId,String userPhone)
-    {
+
+    public void removeFromFavorites(String foodId,String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
         String query = String.format("DELETE FROM Favorites WHERE FoodId='%s' and UserPhone='%s';",foodId,userPhone);
         db.execSQL(query);
     }
-    public boolean isFavorites(String foodId,String userPhone)
-    {
+
+    public boolean isFavorites(String foodId,String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
         String query = String.format("SELECT * FROM Favorites WHERE FoodId='%s' and UserPhone='%s';",foodId,userPhone);
         Cursor cursor = db.rawQuery(query,null);

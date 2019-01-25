@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
         });
 
         //init recycler restaurant
-        recyclerView = (RecyclerView)view.findViewById(R.id.recycler_restaurant);
+        recyclerView = view.findViewById(R.id.recycler_restaurant);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //grid layout halaman home
 
         return view;

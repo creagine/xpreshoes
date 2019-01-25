@@ -25,10 +25,12 @@ public class MyFirebaseMessaging extends FirebaseMessagingService{
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             sendNotificationAPI26(remoteMessage);
         else
             sendNotification(remoteMessage);
+
     }
 
     private void sendNotificationAPI26(RemoteMessage remoteMessage) {

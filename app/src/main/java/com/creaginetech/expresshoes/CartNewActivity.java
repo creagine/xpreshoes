@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -94,7 +95,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     public TextView txtTotalItems;
     public TextView txtAlamat; //public agar bisa dipanggil di cartAdapter
     Button btnPlace;
-    RelativeLayout rootLayout;
+    ConstraintLayout rootLayout;
 
     String address;
 
@@ -282,8 +283,11 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     private void sendNotificationOrder(final String order_number) {
+
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+
         Query data = tokens.orderByChild("serverToken").equalTo(true); //get all node with isServerToken is true
+
         data.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -335,15 +339,13 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         int total = 0;
         for (Order order:cart)
             total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(order.getQuantity()));
-        Locale locale = new Locale("en","US");
-        NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
         int totalitems = 0;
         for (Order order:cart)
             totalitems +=((Integer.parseInt(order.getQuantity())));
 
         txtTotalItems.setText(String.valueOf(totalitems));
-        txtTotalPrice.setText(fmt.format(total));
+        txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
     }
 
     @Override
@@ -446,8 +448,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
             for (Order itemCart : orders)
                 total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
-            Locale locale = new Locale("en","US");
-            NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
             int totalitems = 0;
             for (Order order:cart)
@@ -455,7 +455,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
             txtTotalItems.setText(String.valueOf(totalitems));
 
-            txtTotalPrice.setText(fmt.format(total));
+            txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
 
             //Make Snackbar
             Snackbar snackbar = Snackbar.make(rootLayout,name + "Removed from cart !",Snackbar.LENGTH_SHORT);
@@ -471,8 +471,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
                     List<Order> orders = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
                     for (Order itemCart : orders)
                         total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
-                    Locale locale = new Locale("en","US");
-                    NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
                     int totalitems = 0;
                     for (Order order:cart)
@@ -480,7 +478,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
                     txtTotalItems.setText(String.valueOf(totalitems));
 
-                    txtTotalPrice.setText(fmt.format(total));
+                    txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
@@ -525,9 +523,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             if (mSreetOutput != null)
 
                 txtAlamat.setText(mSreetOutput);
-
-            Toast.makeText(CartNewActivity.this,"street " + mSreetOutput,Toast.LENGTH_LONG).show();
-            Toast.makeText(CartNewActivity.this,"alamat " + txtAlamat.getText().toString(),Toast.LENGTH_LONG).show();
 
         } catch (Exception e) {
             e.printStackTrace();

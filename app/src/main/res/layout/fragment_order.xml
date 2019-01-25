@@ -5,7 +5,7 @@
     android:background="@color/colorPrimaryDark"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OrderStatusActivity">
+    tools:context=".MainNewActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listOrders"

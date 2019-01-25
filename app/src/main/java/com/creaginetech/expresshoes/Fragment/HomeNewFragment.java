@@ -12,6 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
@@ -19,6 +21,7 @@ import com.creaginetech.expresshoes.HomeActivity;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Shop;
 import com.creaginetech.expresshoes.R;
+import com.creaginetech.expresshoes.SearchActivity;
 import com.creaginetech.expresshoes.ServiceListActivity;
 import com.creaginetech.expresshoes.ViewHolder.ShopViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -29,11 +32,11 @@ import com.squareup.picasso.Picasso;
 //gantinya homefragment, udah pake model shop
 public class HomeNewFragment extends Fragment {
 
+    //var search bar
+    private TextView txtSearchBar;
+
     //var recycler
     RecyclerView recyclerView;
-
-    //var refresf layout
-    SwipeRefreshLayout swipeRefreshLayout;
 
     //firebase recycler adapter
     FirebaseRecyclerAdapter<Shop,ShopViewHolder> adapter;
@@ -55,46 +58,34 @@ public class HomeNewFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_new, container, false);
 
-        //View - cp-28 (Refresh layout)
-        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.swipe_layout);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_blue_dark);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if(Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
-
-                    //load list shop
-                    loadShop();
-
-                else {
-                    Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
-                    return;
-                }
-            }
-        });
-
-        //Default, load for first time
-        swipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                if(Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
-
-                    //load list shop
-                    loadShop();
-
-                else {
-                    Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
-                    return;
-                }
-            }
-        });
+        //init search bar
+        txtSearchBar = view.findViewById(R.id.search_field);
 
         //init recycler shop
         recyclerView = view.findViewById(R.id.recycler_shop);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); //grid layout halaman home
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        if(Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
+
+            //load list shop
+            loadShop();
+
+        else {
+
+            //check internet connnection
+            Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show();
+
+        }
+
+        txtSearchBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
+
+            }
+        });
 
     return view;
     }
@@ -145,11 +136,8 @@ public class HomeNewFragment extends Fragment {
             }
         };
 
-
-
         adapter.startListening();
         recyclerView.setAdapter(adapter);
-        swipeRefreshLayout.setRefreshing(false);
 
     }
 

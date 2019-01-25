@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Model.Request;
-import com.creaginetech.expresshoes.OrderStatusActivity;
 import com.creaginetech.expresshoes.R;
 import com.creaginetech.expresshoes.ViewHolder.OrderViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -23,7 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-public class TransactionFragment extends Fragment {
+public class OrderFragment extends Fragment {
 
     public RecyclerView recyclerView;
     public RecyclerView.LayoutManager layoutManager;
@@ -33,7 +32,7 @@ public class TransactionFragment extends Fragment {
     FirebaseDatabase database;
     DatabaseReference requests;
 
-    public TransactionFragment() {
+    public OrderFragment() {
         // Required empty public constructor
     }
 
@@ -46,13 +45,13 @@ public class TransactionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_transaction, container, false);
+        View view = inflater.inflate(R.layout.fragment_order, container, false);
 
         //Firebase
         database = FirebaseDatabase.getInstance();
         requests = database.getReference("Requests");
 
-        recyclerView = (RecyclerView)view.findViewById(R.id.listOrders);
+        recyclerView = view.findViewById(R.id.listOrders);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);

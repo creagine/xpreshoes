@@ -12,9 +12,11 @@ public class MyFirebaseIdService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
         super.onTokenRefresh();
+
         String tokenRefreshed = FirebaseInstanceId.getInstance().getToken();
         if (Common.currentUser != null)
             updateTokenToFirebase(tokenRefreshed);
+
     }
 
     private void updateTokenToFirebase(String tokenRefreshed) {

@@ -8,9 +8,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
@@ -18,7 +23,9 @@ import com.creaginetech.expresshoes.Database.Database;
 import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Food;
 import com.creaginetech.expresshoes.Model.Order;
+import com.creaginetech.expresshoes.Model.Shop;
 import com.creaginetech.expresshoes.ViewHolder.FoodViewHolder;
+import com.creaginetech.expresshoes.ViewHolder.ShopViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -35,43 +42,33 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
 
-    //Search all item
-    FirebaseRecyclerAdapter<Food, FoodViewHolder> adapter;
-    FirebaseRecyclerAdapter<Food, FoodViewHolder> searchAdapter;
+    DatabaseReference shopList;
+
+    //var recycler
+    RecyclerView recyclerView;
+
+    //firebase recycler adapter
+    FirebaseRecyclerAdapter<Shop,ShopViewHolder> searchAdapter;
+
+    //search Functionality
     List<String> suggestList = new ArrayList<>();
     MaterialSearchBar materialSearchBar;
-
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-
-    FirebaseDatabase database;
-    DatabaseReference foodList;
-
-    //Favorites
-    Database localDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        //Firebase
-        database = FirebaseDatabase.getInstance();
-        foodList = database.getReference("Foods");
+        shopList = FirebaseDatabase.getInstance().getReference("shop");
 
-        //localDb
-        localDB = new Database(this);
-
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_search);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
+        //init recycler shop
+        recyclerView = findViewById(R.id.recycler_shop);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //Search
-        materialSearchBar = (MaterialSearchBar) findViewById(R.id.searchBar);
-        materialSearchBar.setHint("Enter your food");
+        materialSearchBar = findViewById(R.id.searchBar);
+        materialSearchBar.setHint("Search shop");
+        materialSearchBar.enableSearch();
         loadSuggest(); // Write function to load suggest from firebase
 
         materialSearchBar.setCardViewElevation(10);
@@ -105,7 +102,7 @@ public class SearchActivity extends AppCompatActivity {
                 //When Search Bar is close
                 //Restore original adapter
                 if (!enabled)
-                    recyclerView.setAdapter(adapter);
+                    recyclerView.setAdapter(searchAdapter);
             }
 
             @Override
@@ -113,7 +110,13 @@ public class SearchActivity extends AppCompatActivity {
                 //WHen search finish
                 //Show result of search adapter
 
-                startSearch(text);
+                if (!text.toString().equals("")) {
+
+                    String capitalizedSearchText = text.toString().substring(0, 1).toUpperCase() + text.toString().substring(1);
+
+                    startSearch(capitalizedSearchText);
+
+                }
 
 
             }
@@ -124,163 +127,95 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-
-        //Load all item
-        loadAllItem();
     }
 
-    private void loadAllItem() {
-        //Create query by category id
-        Query searchByName = foodList;
-        //Create option with query
-        FirebaseRecyclerOptions<Food> foodOptions = new FirebaseRecyclerOptions.Builder<Food>()
-                .setQuery(searchByName, Food.class)
-                .build();
-
-        adapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(foodOptions) {
-            @Override
-            protected void onBindViewHolder(@NonNull final FoodViewHolder viewHolder, final int position, @NonNull final Food model) {
-                viewHolder.food_name.setText(model.getName1());
-                viewHolder.food_price.setText(String.format("$ %s", model.getPrice().toString()));
-                Picasso.with(getBaseContext()).load(model.getImage())
-                        .into(viewHolder.food_image);
-
-                //Add Quck Cart
-
-                viewHolder.quick_cart.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        boolean isExists = new Database(getBaseContext()).checkFoodExists(adapter.getRef(position).getKey(), Common.currentUser.getPhone());
-
-                        if (!isExists) {
-                            new Database(getBaseContext()).addToCart(new Order(
-                                    Common.currentUser.getPhone(),
-                                    //copy from foodDetail
-                                    adapter.getRef(position).getKey(),
-                                    model.getName1(),
-                                    "1",
-                                    model.getPrice(),
-                                    model.getImage()
-
-                            ));
+    //method search
+    private void startSearch(String capitalizedSearchText) {
 
 
-                        } else {
-                            new Database(getBaseContext()).increaseCart(Common.currentUser.getPhone(), adapter.getRef(position).getKey());
-                        }
-                        Toast.makeText(SearchActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
-                    }
-                });
 
-
-                //Add favorites
-                if (localDB.isFavorites(adapter.getRef(position).getKey(), Common.currentUser.getPhone()))
-                    viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
-
-                //Click to change state of favorites
-                viewHolder.fav_image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (!localDB.isFavorites(adapter.getRef(position).getKey(), Common.currentUser.getPhone())) {
-                            localDB.addToFavorites(adapter.getRef(position).getKey(), Common.currentUser.getPhone());
-                            viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
-                            Toast.makeText(SearchActivity.this, "" + model.getName1() + " was added to Favorites", Toast.LENGTH_SHORT).show();
-                        } else {
-                            localDB.removeFromFavorites(adapter.getRef(position).getKey(), Common.currentUser.getPhone());
-                            viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                            Toast.makeText(SearchActivity.this, "" + model.getName1() + " was removed from Favorites", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
-                final Food local = model;
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        //Start new activity
-                        Intent foodDetail = new Intent(SearchActivity.this, FoodDetailActivity.class);
-                        foodDetail.putExtra("FoodId", adapter.getRef(position).getKey()); // Send Food Id to new activity
-                        startActivity(foodDetail);
-                    }
-                });
-            }
-
-
-            @Override
-            public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.food_item, parent, false);
-                return new FoodViewHolder(itemView);
-            }
-        };
-        adapter.startListening();
-        recyclerView.setAdapter(adapter);
-    }
-
-    private void startSearch(CharSequence text) {
         //Create query by name
-        Query searchByName = foodList.orderByChild("name1").equalTo(text.toString());
+        Query searchByName = shopList.orderByChild("shopName").startAt(capitalizedSearchText).endAt(capitalizedSearchText + "\uf8ff");
+
         //Create option with query
-        FirebaseRecyclerOptions<Food> foodOptions = new FirebaseRecyclerOptions.Builder<Food>()
-                .setQuery(searchByName, Food.class)
+        FirebaseRecyclerOptions<Shop> serviceOptions = new FirebaseRecyclerOptions.Builder<Shop>()
+                .setQuery(searchByName, Shop.class)
                 .build();
 
-        searchAdapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(foodOptions) {
+        //adapter hasil search
+        searchAdapter = new FirebaseRecyclerAdapter<Shop, ShopViewHolder>(serviceOptions) {
+            //setup viewholder recyclerview hasil search
             @Override
-            protected void onBindViewHolder(@NonNull FoodViewHolder viewHolder, int position, @NonNull Food model) {
-                viewHolder.food_name.setText(model.getName1());
-                Picasso.with(getBaseContext()).load(model.getImage())
-                        .into(viewHolder.food_image);
+            protected void onBindViewHolder(@NonNull ShopViewHolder viewHolder, int position, @NonNull Shop model) {
 
-                final Food local = model;
+                viewHolder.txt_shop_name.setText(model.getShopName());
+                Picasso.with(getBaseContext()).load(model.getShopImage())
+                        .into(viewHolder.img_shop);
+
+                final Shop clickItem = model;
+
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                        //Start new activity
-                        Intent foodDetail = new Intent(SearchActivity.this, FoodDetailActivity.class);
-                        foodDetail.putExtra("FoodId", searchAdapter.getRef(position).getKey()); // Send Food Id to new activity
-                        startActivity(foodDetail);
+
+                        //Get CategoryId and send to new Activity
+                        Intent serviceList = new Intent(SearchActivity.this, ServiceListActivity.class);
+
+                        //When user select shop, we will save shop id to select service of this shop
+                        Common.restaurantSelected = searchAdapter.getRef(position).getKey();
+
+                        startActivity(serviceList);
+
                     }
                 });
+
             }
 
             @Override
-            public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public ShopViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.food_item, parent, false);
-                return new FoodViewHolder(itemView);
+                        .inflate(R.layout.shop_item, parent, false);
+                return new ShopViewHolder(itemView);
             }
         };
         searchAdapter.startListening();
         recyclerView.setAdapter(searchAdapter); // Set adapter for Recycler View is Search result
     }
 
+    //method suggest pada searchbar
     private void loadSuggest() {
-        foodList.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            Food item = postSnapshot.getValue(Food.class);
-                            suggestList.add(item.getName1()); // Add name of food to suggest list
-                        }
+        shopList.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Shop item = postSnapshot.getValue(Shop.class);
+                    // Add name of shop to suggest list
+                    suggestList.add(item.getShopName());
+                }
 
-                        materialSearchBar.setLastSuggestions(suggestList);
-                    }
+                materialSearchBar.setLastSuggestions(suggestList);
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+            }
+        });
     }
 
     @Override
-    protected void onStop() {
-        if (adapter != null)
-            adapter.stopListening();
+    public void onStop() {
+        super.onStop();
         if (searchAdapter != null)
             searchAdapter.stopListening();
-        super.onStop();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //show item in service list when click back from service detail
+        if (searchAdapter != null)
+            searchAdapter.startListening();
+    }
+
 }

@@ -104,7 +104,7 @@
                         android:layout_marginTop="8dp"
                         android:padding="12dp"
                         android:text="Service Name"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/colorAccent"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -127,7 +127,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="9"
                             android:text="1000"
-                            android:textColor="@color/colorPrimary"
+                            android:textColor="@color/colorAccent"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
