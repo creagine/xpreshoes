@@ -81,8 +81,6 @@ public class OjekActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ojek);
 
-//        getSupportActionBar().setTitle("Ojek Hampir Online");
-
         //variable locationservices buat ambil recent location
         mFusedLocationProviderClient = LocationServices
                 .getFusedLocationProviderClient(this);

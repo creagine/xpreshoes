@@ -81,13 +81,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
                 for (Order itemCart :orders)
                     totalitems +=((Integer.parseInt(itemCart.getQuantity())));
 
+                int totalpayment = total + (int)cart.deliveryFee;
+
                 cart.txtTotalItems.setText(String.valueOf(totalitems));
-                cart.txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
+                cart.txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(totalpayment));
 
 
             }
         });
-
 
         int price = (Integer.parseInt(listData.get(position).getPrice()))*(Integer.parseInt(listData.get(position).getQuantity()));
         holder.txt_price.setText(NumberFormat.getInstance(Locale.GERMAN).format(price));

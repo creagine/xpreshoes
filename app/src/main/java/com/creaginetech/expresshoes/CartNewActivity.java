@@ -45,8 +45,14 @@ import com.creaginetech.expresshoes.Model.Token;
 import com.creaginetech.expresshoes.Remote.APIService;
 import com.creaginetech.expresshoes.ViewHolder.CartAdapter;
 import com.creaginetech.expresshoes.ViewHolder.CartViewHolder;
+import com.creaginetech.expresshoes.network.ApiServices;
 import com.creaginetech.expresshoes.network.AppUtils;
 import com.creaginetech.expresshoes.network.FetchAddressIntentService;
+import com.creaginetech.expresshoes.network.InitLibrary;
+import com.creaginetech.expresshoes.response.Distance;
+import com.creaginetech.expresshoes.response.Duration;
+import com.creaginetech.expresshoes.response.LegsItem;
+import com.creaginetech.expresshoes.response.ResponseRoute;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -60,6 +66,9 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -68,6 +77,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.PolyUtil;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.text.NumberFormat;
@@ -82,6 +92,8 @@ import retrofit2.Response;
 public class CartNewActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,LocationListener, RecyclerItemTouchHelperListener {
 
+    private String API_KEY = "AIzaSyDLrgdsWEVRd2fSPohzzECFikV8GeFxx8A";
+
     //VARIABLE RECYCLER
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -94,10 +106,16 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     public TextView txtTotalPrice;
     public TextView txtTotalItems;
     public TextView txtAlamat; //public agar bisa dipanggil di cartAdapter
+    public TextView txtDistance;
+    public TextView txtDeliveryFee;
     Button btnPlace;
     ConstraintLayout rootLayout;
 
     String address;
+
+    public double deliveryFee;
+
+    public int total, totalPayment;
 
     //CART ADAPTER
     List<Order> cart = new ArrayList<>();
@@ -109,6 +127,9 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+
+    //shop location
+    public LatLng locationLatLng = new LatLng(-7.9651854,112.6070822);
 
     private static final int UPDATE_INTERVAL = 5000;
     private static final int FATEST_INTERVAL = 3000;
@@ -177,7 +198,11 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         txtTotalPrice = findViewById(R.id.total);
         txtTotalItems = findViewById(R.id.totalItemsCart);
         txtAlamat = findViewById(R.id.textViewAlamat);
+        txtDeliveryFee = findViewById(R.id.deliveryFee);
+        txtDistance = findViewById(R.id.distance);
         btnPlace = findViewById(R.id.btnPlaceOrder);
+
+        loadListFood();
 
         //BUTTON PLACE ORDER
         btnPlace.setOnClickListener(new View.OnClickListener() {
@@ -225,8 +250,6 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
             }
         });
-
-        loadListFood();
 
     }
 
@@ -336,7 +359,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         recyclerView.setAdapter(adapter);
 
         //Calculate total price
-        int total = 0;
+        total = 0;
         for (Order order:cart)
             total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(order.getQuantity()));
 
@@ -344,8 +367,11 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         for (Order order:cart)
             totalitems +=((Integer.parseInt(order.getQuantity())));
 
+        totalPayment = total + (int)deliveryFee;
+
         txtTotalItems.setText(String.valueOf(totalitems));
-        txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
+        txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(totalPayment));
+
     }
 
     @Override
@@ -400,6 +426,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
                 mLocation.setLongitude(mLastLocation.getLongitude());
 
                 startIntentService(mLocation);
+                getRoutes();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -443,7 +470,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
             //Update tctTotal di cart
             //Calculate total price
-            int total = 0;
+            total = 0;
             List<Order> orders = new Database(this.getBaseContext()).getCarts(Common.currentUser.getPhone());
 
             for (Order itemCart : orders)
@@ -453,9 +480,10 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
             for (Order order:cart)
                 totalitems +=((Integer.parseInt(order.getQuantity())));
 
-            txtTotalItems.setText(String.valueOf(totalitems));
+            totalPayment = total + (int)deliveryFee;
 
-            txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
+            txtTotalItems.setText(String.valueOf(totalitems));
+            txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(totalPayment));
 
             //Make Snackbar
             Snackbar snackbar = Snackbar.make(rootLayout,name + "Removed from cart !",Snackbar.LENGTH_SHORT);
@@ -467,7 +495,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
                     //Update tctTotal di cart
                     //Calculate total price
-                    int total = 0;
+                    total = 0;
                     List<Order> orders = new Database(getBaseContext()).getCarts(Common.currentUser.getPhone());
                     for (Order itemCart : orders)
                         total+=(Integer.parseInt(itemCart.getPrice()))*(Integer.parseInt(itemCart.getQuantity()));
@@ -476,9 +504,10 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
                     for (Order order:cart)
                         totalitems +=((Integer.parseInt(order.getQuantity())));
 
-                    txtTotalItems.setText(String.valueOf(totalitems));
+                    totalPayment = total + (int)deliveryFee;
 
-                    txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(total));
+                    txtTotalItems.setText(String.valueOf(totalitems));
+                    txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(totalPayment));
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
@@ -549,6 +578,56 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
         startService(intent);
     }
     //END
+
+    //method hitung jarak & ongkir
+    private void getRoutes(){
+
+        String lokasiAwal = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude();
+        String lokasiAkhir = locationLatLng.latitude + "," + locationLatLng.longitude;
+
+        // Panggil Retrofit
+        ApiServices api = InitLibrary.getInstance();
+
+        // Siapkan request
+        Call<ResponseRoute> routeRequest = api.request_route(lokasiAwal, lokasiAkhir, API_KEY);
+
+        // kirim request
+        routeRequest.enqueue(new Callback<ResponseRoute>() {
+            @Override
+            public void onResponse(Call<ResponseRoute> call, Response<ResponseRoute> response) {
+
+                if (response.isSuccessful()){
+
+                    // tampung response ke variable
+                    ResponseRoute dataDirection = response.body();
+
+                    LegsItem dataLegs = dataDirection.getRoutes().get(0).getLegs().get(0);
+
+                    // Dapatkan jarak dan waktu
+                    Distance dataDistance = dataLegs.getDistance();
+                    Duration dataDuration = dataLegs.getDuration();
+
+                    // ambil Nilai buat Widget
+                    double price_per_meter = 4; // x1000 per KM
+                    deliveryFee = dataDistance.getValue() * price_per_meter; // Jarak * harga permeter
+
+                    // Set Nilai Ke Widget
+                    txtDistance.setText("("+dataDistance.getText()+")");
+                    txtDeliveryFee.setText(NumberFormat.getInstance(Locale.GERMAN).format(deliveryFee));
+
+                    totalPayment = total + (int)deliveryFee;
+                    txtTotalPrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(totalPayment));
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseRoute> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+    }
 
     @Override
     protected void onStart() {
