@@ -2,14 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/colorPrimaryDark"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainNewActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listOrders"
-        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

@@ -99,7 +99,7 @@ public class FoodList extends AppCompatActivity {
 
         //Firebase database
         database = FirebaseDatabase.getInstance();
-        foodList = database.getReference("Restaurants").child(Common.restaurantSelected)
+        foodList = database.getReference("Restaurants").child(Common.shopSelected)
                 .child("detail").child("Foods");
 
         //local database for cart

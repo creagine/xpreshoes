@@ -127,7 +127,7 @@ public class OjekActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(OjekActivity.this, MainActivity.class);
+                Intent intent = new Intent(OjekActivity.this, MainNewActivity.class);
                 startActivity(intent);
             }
         });

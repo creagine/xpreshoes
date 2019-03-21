@@ -16,7 +16,9 @@ public class Common {
 
     public static String PHONE_TEXT = "userPhone";
 
-    public static String restaurantSelected = "";
+    public static String shopSelected = "";
+
+    public static String serviceSelected = "";
 
     private static final String BASE_URL = "https://fcm.googleapis.com/";
 

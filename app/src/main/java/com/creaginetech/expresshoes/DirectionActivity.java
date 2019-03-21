@@ -69,7 +69,7 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DirectionActivity.this, MainActivity.class);
+                Intent intent = new Intent(DirectionActivity.this, MainNewActivity.class);
                 startActivity(intent);
             }
         });

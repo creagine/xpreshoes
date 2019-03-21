@@ -14,9 +14,9 @@ import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.HomeActivity;
-import com.creaginetech.expresshoes.MainActivity;
+//import com.creaginetech.expresshoes.MainActivity;
 import com.creaginetech.expresshoes.R;
-import com.facebook.accountkit.AccountKit;
+//import com.facebook.accountkit.AccountKit;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
@@ -80,10 +80,10 @@ public class AccountFragment extends Fragment {
 
                 //Logout
 
-                Intent signIn = new Intent(getActivity(),MainActivity.class);
-                signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                AccountKit.logOut();
-                startActivity(signIn);
+//                Intent signIn = new Intent(getActivity(),MainActivity.class);
+//                signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+////                AccountKit.logOut();
+//                startActivity(signIn);
 
             }
         });

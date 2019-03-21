@@ -179,7 +179,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
 
         //Firebase DATABASE
         database = FirebaseDatabase.getInstance();
-        requestReference = database.getReference("order").child(Common.restaurantSelected);
+        requestReference = database.getReference("Order");
 
         //Init RECYCLER
         recyclerView = findViewById(R.id.listCart);
@@ -219,7 +219,7 @@ public class CartNewActivity extends AppCompatActivity implements GoogleApiClien
                             txtTotalPrice.getText().toString(),
                             "0", // status
                             String.format("%s,%s",mLastLocation.getLatitude(),mLastLocation.getLongitude()),
-                            Common.restaurantSelected,
+                            Common.shopSelected,
                             cart
                     );
 

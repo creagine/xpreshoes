@@ -30,7 +30,7 @@ public class OrderFragment extends Fragment {
     FirebaseRecyclerAdapter<Request,OrderViewHolder> adapter;
 
     FirebaseDatabase database;
-    DatabaseReference requests;
+    DatabaseReference orderRef;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -49,19 +49,14 @@ public class OrderFragment extends Fragment {
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        requests = database.getReference("Requests");
+        orderRef = database.getReference("Order");
 
         recyclerView = view.findViewById(R.id.listOrders);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        //if we start OrderStatus activiy from home activity
-        // we will not put any extra, so we just loadOrder by phone from common
-        if (getActivity().getIntent() == null)
-            loadOrder(Common.currentUser.getPhone());
-        else
-            loadOrder(getActivity().getIntent().getStringExtra("userPhone"));
+        loadOrder(Common.currentUser.getPhone());
 
         return view;
 
@@ -70,10 +65,10 @@ public class OrderFragment extends Fragment {
     private void loadOrder(String phone) {
 
         //Create query by user
-        Query getOrderByUser = requests.orderByChild("phone").equalTo(phone);
+        Query getOrderByUser = orderRef.orderByChild("phone").equalTo(phone);
         //Create option with query
         FirebaseRecyclerOptions<Request> orderOptions = new FirebaseRecyclerOptions.Builder<Request>()
-                .setQuery(requests,Request.class)
+                .setQuery(getOrderByUser,Request.class)
                 .build();
 
         adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(orderOptions) {
@@ -99,7 +94,7 @@ public class OrderFragment extends Fragment {
             @Override
             public OrderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.order_layout,parent,false);
+                        .inflate(R.layout.order_item,parent,false);
                 return new OrderViewHolder(itemView);
             }
         };
@@ -108,7 +103,7 @@ public class OrderFragment extends Fragment {
     }
 
     private void deleteOrder(final String key) {
-        requests.child(key)
+        orderRef.child(key)
                 .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

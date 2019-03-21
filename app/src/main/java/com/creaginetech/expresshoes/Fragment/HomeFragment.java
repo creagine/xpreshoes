@@ -129,7 +129,7 @@ public class HomeFragment extends Fragment {
                         Intent foodList = new Intent(getActivity(), HomeActivity.class);
 
                         //When user select restaurant, we will save restaurant id to select category of this restaurant
-                        Common.restaurantSelected = adapter.getRef(position).getKey();
+                        Common.shopSelected = adapter.getRef(position).getKey();
 
                         startActivity(foodList);
 

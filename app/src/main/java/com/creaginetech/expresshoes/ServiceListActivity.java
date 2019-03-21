@@ -67,7 +67,7 @@ public class ServiceListActivity extends AppCompatActivity {
     //variable widget
     BottomSheetBehavior sheetBehavior;
     LinearLayout layoutBottomSheet;
-    TextView txtTotalItems, txtTotalPrice, txtShopName;
+    TextView txtTotalItems, txtTotalPrice, txtShopName, txtShopAddress;
     ImageView shopImage;
     CollapsingToolbarLayout collapsingToolbarLayout;
 
@@ -80,8 +80,8 @@ public class ServiceListActivity extends AppCompatActivity {
 
         //Firebase database
         database = FirebaseDatabase.getInstance();
-        serviceList = database.getReference("service").child(Common.restaurantSelected); //EDIT THIS
-        shopRef = database.getReference("shop").child(Common.restaurantSelected);
+        serviceList = database.getReference("Service").child(Common.shopSelected); //EDIT THIS
+        shopRef = database.getReference("Shop").child(Common.shopSelected);
 
         //local database for cart
         localDB = new Database(this);
@@ -91,6 +91,7 @@ public class ServiceListActivity extends AppCompatActivity {
         txtTotalItems = findViewById(R.id.totalitems);
         txtTotalPrice = findViewById(R.id.totalprice);
         txtShopName = findViewById(R.id.shop_name);
+        txtShopAddress = findViewById(R.id.textViewShopAddress);
         shopImage = findViewById(R.id.img_shop);
         collapsingToolbarLayout = findViewById(R.id.collapsing);
         recyclerView = findViewById(R.id.recycler_service);
@@ -135,6 +136,7 @@ public class ServiceListActivity extends AppCompatActivity {
 //                setCollapsingToolbarTitle(currentShop.getShopName());
 
                 txtShopName.setText(currentShop.getShopName());
+                txtShopAddress.setText(currentShop.getShopAddress());
 
             }
 
@@ -240,7 +242,7 @@ public class ServiceListActivity extends AppCompatActivity {
                     public void onClick(View view, int position, boolean isLongClick) {
                         //Start new activity
                         Intent serviceDetail = new Intent(ServiceListActivity.this, ServiceDetailActivity.class);
-                        serviceDetail.putExtra("serviceId", adapter.getRef(position).getKey()); // Send service Id to new activity
+                        Common.serviceSelected = adapter.getRef(position).getKey(); // Send service Id to new activity
                         startActivity(serviceDetail);
                     }
                 });

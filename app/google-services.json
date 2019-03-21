@@ -104,6 +104,50 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:845087469645:android:30590a055f46eee4",
+        "android_client_info": {
+          "package_name": "com.creaginetech.xpreshoesadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "845087469645-3jv39heool8bhipue17n756kpkltsn2c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.creaginetech.xpreshoesadmin",
+            "certificate_hash": "3213eee043b37309341b8a906bab82f427abc034"
+          }
+        },
+        {
+          "client_id": "845087469645-8cfgg0olerer436s8u470l0e3lvputpd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaWeRxmwuQwgELVNy3igzSTXu9w_paVR4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "845087469645-8cfgg0olerer436s8u470l0e3lvputpd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:845087469645:android:eb2d2d0f4dd1931a",
         "android_client_info": {
           "package_name": "com.creaginetech.xpreshoesshipper"

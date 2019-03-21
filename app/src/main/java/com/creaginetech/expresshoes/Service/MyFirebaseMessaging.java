@@ -12,7 +12,8 @@ import android.support.v4.app.NotificationCompat;
 
 import com.creaginetech.expresshoes.Common.Common;
 import com.creaginetech.expresshoes.Helper.NotificationHelper;
-import com.creaginetech.expresshoes.MainActivity;
+//import com.creaginetech.expresshoes.MainActivity;
+import com.creaginetech.expresshoes.MainNewActivity;
 import com.creaginetech.expresshoes.OrderStatusActivity;
 import com.creaginetech.expresshoes.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -54,7 +55,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService{
 
     private void sendNotification(RemoteMessage remoteMessage) {
         RemoteMessage.Notification notification = remoteMessage.getNotification();
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainNewActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
 

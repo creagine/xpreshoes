@@ -45,7 +45,7 @@ import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
-import com.facebook.accountkit.AccountKit;
+//import com.facebook.accountkit.AccountKit;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -253,7 +253,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //Init Firebase
         database = FirebaseDatabase.getInstance();
-        category = database.getReference("Restaurants").child(Common.restaurantSelected)
+        category = database.getReference("Restaurants").child(Common.shopSelected)
         .child("detail").child("Category");
 
         Paper.init(this);

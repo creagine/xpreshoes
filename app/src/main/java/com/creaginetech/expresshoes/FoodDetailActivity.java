@@ -75,7 +75,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        foods = database.getReference("Restaurants").child(Common.restaurantSelected)
+        foods = database.getReference("Restaurants").child(Common.shopSelected)
                 .child("detail").child("Foods");
         ratingTbl = database.getReference("Rating");
 

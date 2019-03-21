@@ -55,7 +55,7 @@ public class ServiceDetailActivity extends AppCompatActivity implements RatingDi
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        service = database.getReference("service").child(Common.restaurantSelected);
+        service = database.getReference("Service").child(Common.shopSelected);
         ratingTbl = database.getReference("Rating");
 
         //Init View
@@ -102,20 +102,10 @@ public class ServiceDetailActivity extends AppCompatActivity implements RatingDi
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
 
-        //Get Food Id from Intent
-        if (getIntent() != null)
-            serviceId = getIntent().getStringExtra("serviceId");
-        if (!serviceId.isEmpty())
-        {
-            if (Common.isConnectedToInternet(getBaseContext()))
-            {
+        serviceId = Common.serviceSelected;
                 getDetailService(serviceId);
                 getRatingService(serviceId);
-            }
-            else {
-                Toast.makeText(ServiceDetailActivity.this, "Please Check your connection", Toast.LENGTH_SHORT).show(); //check internet connnection
-            }
-        }
+
     }
 
     private void getRatingService(String serviceId) {

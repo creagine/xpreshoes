@@ -12,9 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
-import com.creaginetech.expresshoes.Model.Food;
 import com.creaginetech.expresshoes.Model.Request;
-import com.creaginetech.expresshoes.ViewHolder.FoodViewHolder;
 import com.creaginetech.expresshoes.ViewHolder.OrderViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -24,7 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class OrderStatusActivity extends AppCompatActivity {
@@ -108,7 +105,7 @@ public class OrderStatusActivity extends AppCompatActivity {
             @Override
             public OrderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.order_layout,parent,false);
+                        .inflate(R.layout.order_item,parent,false);
                 return new OrderViewHolder(itemView);
             }
         };

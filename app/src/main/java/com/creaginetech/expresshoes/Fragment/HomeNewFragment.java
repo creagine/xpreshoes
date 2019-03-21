@@ -97,7 +97,7 @@ public class HomeNewFragment extends Fragment {
         FirebaseRecyclerOptions<Shop> options = new FirebaseRecyclerOptions.Builder<Shop>()
                 .setQuery(FirebaseDatabase.getInstance()
                                 .getReference()
-                                .child("shop")
+                                .child("Shop")
                         ,Shop.class)
                 .build();
 
@@ -109,6 +109,7 @@ public class HomeNewFragment extends Fragment {
                 viewHolder.txt_shop_name.setText(model.getShopName());
                 Picasso.with(getActivity().getBaseContext()).load(model.getShopImage())
                         .into(viewHolder.img_shop);
+                viewHolder.txt_shop_address.setText(model.getShopAddress());
 
                 final Shop clickItem = model;
 
@@ -120,7 +121,7 @@ public class HomeNewFragment extends Fragment {
                         Intent serviceList = new Intent(getActivity(), ServiceListActivity.class);
 
                         //When user select shop, we will save shop id to select service of this shop
-                        Common.restaurantSelected = adapter.getRef(position).getKey();
+                        Common.shopSelected = adapter.getRef(position).getKey();
 
                         startActivity(serviceList);
 

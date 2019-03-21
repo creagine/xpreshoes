@@ -103,7 +103,7 @@ public class RestaurantList extends AppCompatActivity {
                         //Get CategoryId and send to new Activity
                         Intent foodList = new Intent(RestaurantList.this, HomeActivity.class);
                         //When user select restaurant, we will save restaurant id to select category of this restaurant
-                        Common.restaurantSelected = adapter.getRef(position).getKey();
+                        Common.shopSelected = adapter.getRef(position).getKey();
                         startActivity(foodList);
                     }
                 });

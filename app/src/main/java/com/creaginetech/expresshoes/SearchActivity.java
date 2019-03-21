@@ -59,7 +59,7 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        shopList = FirebaseDatabase.getInstance().getReference("shop");
+        shopList = FirebaseDatabase.getInstance().getReference("Shop");
 
         //init recycler shop
         recyclerView = findViewById(R.id.recycler_shop);
@@ -162,7 +162,7 @@ public class SearchActivity extends AppCompatActivity {
                         Intent serviceList = new Intent(SearchActivity.this, ServiceListActivity.class);
 
                         //When user select shop, we will save shop id to select service of this shop
-                        Common.restaurantSelected = searchAdapter.getRef(position).getKey();
+                        Common.shopSelected = searchAdapter.getRef(position).getKey();
 
                         startActivity(serviceList);
 

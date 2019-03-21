@@ -92,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             Common.currentUser = localUser;
 
+
                         }
 
                         @Override
