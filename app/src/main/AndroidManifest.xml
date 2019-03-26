@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.creaginetech.expresshoes">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/logo_expresshoes"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/logo_expresshoes"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon">
+        <activity android:name=".LoginActivity"
+            android:theme="@style/AppTheme.Launcher"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDLrgdsWEVRd2fSPohzzECFikV8GeFxx8A" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.accountkit.ApplicationName"
+            android:value="@string/app_name" />
+        <meta-data
+            android:name="com.facebook.accountkit.ClientToken"
+            android:value="@string/ACCOUNT_KIT_CLIENT_TOKEN" />
+        <service android:name=".Service.MyFirebaseIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".Service.MyFirebaseMessaging">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".network.FetchAddressIntentService"
+            android:exported="false" />
+
+        <activity android:name="com.facebook.accountkit.ui.AccountKitActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".SignUpActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".HomeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".FoodList"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".FoodDetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".OrderStatusActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SearchActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RestaurantList"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainNewActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".CartNewActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MapsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".DirectionActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".OjekActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ResultActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ServiceListActivity"
+            android:theme="@style/AppThemeFullscreen"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ServiceDetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".VerifyPhoneActivity"
+            android:screenOrientation="portrait"/>
+    </application>
+
+</manifest>
