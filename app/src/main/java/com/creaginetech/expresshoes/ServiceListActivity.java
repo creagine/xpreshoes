@@ -21,6 +21,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ public class ServiceListActivity extends AppCompatActivity {
     TextView txtTotalItems, txtTotalPrice, txtShopName, txtShopAddress;
     ImageView shopImage;
     CollapsingToolbarLayout collapsingToolbarLayout;
+    ProgressBar progressBarServiceList;
 
     List<Order> cart = new ArrayList<>();
 
@@ -95,6 +97,7 @@ public class ServiceListActivity extends AppCompatActivity {
         shopImage = findViewById(R.id.img_shop);
         collapsingToolbarLayout = findViewById(R.id.collapsing);
         recyclerView = findViewById(R.id.recycler_service);
+        progressBarServiceList = findViewById(R.id.progressBarServiceList);
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -150,6 +153,7 @@ public class ServiceListActivity extends AppCompatActivity {
 
     //method load list makanan
     private void loadListService() {
+        progressBarServiceList.setVisibility(View.VISIBLE);
 
         //firebase recycler, model Shop
         FirebaseRecyclerOptions<Service> options = new FirebaseRecyclerOptions.Builder<Service>()
@@ -160,6 +164,9 @@ public class ServiceListActivity extends AppCompatActivity {
         adapter = new FirebaseRecyclerAdapter<Service, ServiceViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull final ServiceViewHolder viewHolder, final int position, @NonNull final Service model) {
+
+                progressBarServiceList.setVisibility(View.GONE);
+
                 viewHolder.serviceName.setText(model.getServiceName());
                 viewHolder.servicePrice.setText(NumberFormat.getInstance(Locale.GERMAN).format(Integer.parseInt(model.getPrice())));
                 Picasso.with(getBaseContext()).load(model.getServiceImage())

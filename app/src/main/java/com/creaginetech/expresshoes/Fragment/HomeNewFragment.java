@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,12 +35,13 @@ public class HomeNewFragment extends Fragment {
 
     //var search bar
     private TextView txtSearchBar;
+    private ProgressBar progressBarHome;
 
     //var recycler
     RecyclerView recyclerView;
 
     //firebase recycler adapter
-    FirebaseRecyclerAdapter<Shop,ShopViewHolder> adapter;
+    FirebaseRecyclerAdapter<Shop, ShopViewHolder> adapter;
 
     public HomeNewFragment() {
         // Required empty public constructor
@@ -61,11 +63,13 @@ public class HomeNewFragment extends Fragment {
         //init search bar
         txtSearchBar = view.findViewById(R.id.search_field);
 
+        progressBarHome = view.findViewById(R.id.progressBarHome);
+
         //init recycler shop
         recyclerView = view.findViewById(R.id.recycler_shop);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        if(Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
+        if (Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
 
             //load list shop
             loadShop();
@@ -87,24 +91,28 @@ public class HomeNewFragment extends Fragment {
             }
         });
 
-    return view;
+        return view;
     }
 
     //method load shop
     private void loadShop() {
+
+        progressBarHome.setVisibility(View.VISIBLE);
 
         //firebase recycler, model Shop
         FirebaseRecyclerOptions<Shop> options = new FirebaseRecyclerOptions.Builder<Shop>()
                 .setQuery(FirebaseDatabase.getInstance()
                                 .getReference()
                                 .child("Shop")
-                        ,Shop.class)
+                        , Shop.class)
                 .build();
 
         //recycler adapter shop - ShopViewHolder
         adapter = new FirebaseRecyclerAdapter<Shop, ShopViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull ShopViewHolder viewHolder, int position, @NonNull Shop model) {
+
+                progressBarHome.setVisibility(View.GONE);
 
                 viewHolder.txt_shop_name.setText(model.getShopName());
                 Picasso.with(getActivity().getBaseContext()).load(model.getShopImage())
