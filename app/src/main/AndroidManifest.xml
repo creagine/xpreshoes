@@ -14,8 +14,7 @@
         android:roundIcon="@drawable/logo_expresshoes"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:replace="android:icon">
         <activity android:name=".LoginActivity"
             android:theme="@style/AppTheme.Launcher"
             android:screenOrientation="portrait">
