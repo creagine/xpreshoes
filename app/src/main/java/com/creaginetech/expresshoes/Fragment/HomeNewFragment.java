@@ -35,7 +35,9 @@ public class HomeNewFragment extends Fragment {
 
     //var search bar
     private TextView txtSearchBar;
-    private ProgressBar progressBarHome;
+//    private ProgressBar progressBarHome;
+
+    private SwipeRefreshLayout swipeRefreshShop;
 
     //var recycler
     RecyclerView recyclerView;
@@ -63,13 +65,17 @@ public class HomeNewFragment extends Fragment {
         //init search bar
         txtSearchBar = view.findViewById(R.id.search_field);
 
-        progressBarHome = view.findViewById(R.id.progressBarHome);
+//        progressBarHome = view.findViewById(R.id.progressBarHome);
+
+        //Swipe Refresh
+        swipeRefreshShop = view.findViewById(R.id.swipeRefreshShop);
+        swipeRefreshShop.setColorSchemeResources(R.color.colorAccent,R.color.primary_light,R.color.colorPrimaryDark);
 
         //init recycler shop
         recyclerView = view.findViewById(R.id.recycler_shop);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        if (Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check intrnt
+        if (Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check internet connection
 
             //load list shop
             loadShop();
@@ -80,6 +86,13 @@ public class HomeNewFragment extends Fragment {
             Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show();
 
         }
+
+        swipeRefreshShop.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadShop();
+            }
+        });
 
         txtSearchBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +110,7 @@ public class HomeNewFragment extends Fragment {
     //method load shop
     private void loadShop() {
 
-        progressBarHome.setVisibility(View.VISIBLE);
+//        progressBarHome.setVisibility(View.VISIBLE);
 
         //firebase recycler, model Shop
         FirebaseRecyclerOptions<Shop> options = new FirebaseRecyclerOptions.Builder<Shop>()
@@ -112,7 +125,10 @@ public class HomeNewFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull ShopViewHolder viewHolder, int position, @NonNull Shop model) {
 
-                progressBarHome.setVisibility(View.GONE);
+//                progressBarHome.setVisibility(View.GONE);
+
+                //Cancel Swipe refresh
+                swipeRefreshShop.setRefreshing(false);
 
                 viewHolder.txt_shop_name.setText(model.getShopName());
                 Picasso.with(getActivity().getBaseContext()).load(model.getShopImage())
@@ -150,11 +166,12 @@ public class HomeNewFragment extends Fragment {
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        adapter.stopListening();
-    }
+    //error when navigation_home on pressed with no internet connection
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        adapter.stopListening();
+//    }
 
     @Override
     public void onResume() {

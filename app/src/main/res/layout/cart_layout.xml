@@ -78,14 +78,15 @@
 
         <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
             android:id="@+id/btn_quantity"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
             android:layout_margin="10dp"
             app:backGroundColor="@color/colorBackground"
             app:finalNumber="20"
             app:initialNumber="1"
             app:textColor="@color/colorAccent"
-            app:textSize="6sp" />
+            app:textSize="8sp"
+            />
 
     </LinearLayout>
 

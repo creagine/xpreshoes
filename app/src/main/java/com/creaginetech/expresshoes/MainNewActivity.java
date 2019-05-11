@@ -57,22 +57,18 @@ public class MainNewActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     fragment = new HomeNewFragment();
                     loadFragment(fragment);
-                    return true;
+                    break;
                 case R.id.navigation_orders:
                     fragment = new OrderFragment();
                     loadFragment(fragment);
-                    return true;
+                    break;
                 case R.id.navigation_account:
                     fragment = new AccountFragment();
                     loadFragment(fragment);
-                    return true;
-//                case R.id.navigation_cart:
-//                    fragment = new CartFragment();
-//                    loadFragment(fragment);
-//                    return true;
+                    break;
             }
 
-            return false;
+            return true;
 
         }
     };

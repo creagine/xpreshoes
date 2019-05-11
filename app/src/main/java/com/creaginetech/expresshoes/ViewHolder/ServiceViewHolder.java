@@ -2,6 +2,7 @@ package com.creaginetech.expresshoes.ViewHolder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -11,7 +12,8 @@ import com.creaginetech.expresshoes.R;
 public class ServiceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
     public TextView serviceName,servicePrice;
-    public ImageView serviceImage, fav_image, quick_cart;
+    public ImageView serviceImage, fav_image;
+    public Button quick_cart;
 
     private ItemClickListener itemClickListener;
 
@@ -27,7 +29,7 @@ public class ServiceViewHolder extends RecyclerView.ViewHolder implements View.O
         serviceImage = (ImageView)itemView.findViewById(R.id.service_image);
         fav_image = (ImageView)itemView.findViewById(R.id.fav);
         servicePrice = (TextView) itemView.findViewById(R.id.service_price);
-        quick_cart = (ImageView)itemView.findViewById(R.id.btn_quick_cart);
+        quick_cart = (Button) itemView.findViewById(R.id.btn_quick_cart);
 
         itemView.setOnClickListener(this);
     }
