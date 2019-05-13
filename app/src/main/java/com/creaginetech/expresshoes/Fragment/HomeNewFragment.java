@@ -181,4 +181,6 @@ public class HomeNewFragment extends Fragment {
             adapter.startListening();
     }
 
+
+
 }
