@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/navigation_home"
+        android:enabled="true"
+        android:icon="@drawable/ic_home_24dp"
+        android:title="Home"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/navigation_orders"
+        android:enabled="true"
+        android:icon="@drawable/ic_transaction_24dp"
+        android:title="Orders"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/navigation_account"
+        android:enabled="true"
+        android:icon="@drawable/ic_person_24dp"
+        android:title="Account"
+        app:showAsAction="always" />
+</menu>

@@ -1,0 +1,278 @@
+package com.creaginetech.expresshoes.Fragment;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.creaginetech.expresshoes.Common.Common;
+//import com.creaginetech.expresshoes.MainActivity;
+import com.creaginetech.expresshoes.LoginActivity;
+import com.creaginetech.expresshoes.MainNewActivity;
+import com.creaginetech.expresshoes.Model.User;
+import com.creaginetech.expresshoes.R;
+//import com.facebook.accountkit.AccountKit;
+import com.creaginetech.expresshoes.VerifyPhoneActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.rengwuxian.materialedittext.MaterialEditText;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import dmax.dialog.SpotsDialog;
+import io.paperdb.Paper;
+
+public class AccountFragment extends Fragment implements View.OnClickListener {
+
+    Button btnLogout, btnSaveAccount;
+    EditText edtAccountName,edtAccountPhone,edtAccountHomeAddress;
+
+    DatabaseReference mDatabase;
+    FirebaseAuth mAuth;
+    FirebaseUser mFirebaseUser;
+
+    public AccountFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_account, container, false);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference("User");
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mAuth.getCurrentUser();
+
+        btnLogout = view.findViewById(R.id.buttonLogout);
+        btnSaveAccount = view.findViewById(R.id.btnSaveAccount);
+        edtAccountName = view.findViewById(R.id.edtAccountName);
+        edtAccountPhone = view.findViewById(R.id.edtAccountPhone);
+        edtAccountHomeAddress = view.findViewById(R.id.edtAccountHomeAddress);
+
+//        edtAccountName.setOnClickListener(this);
+//        edtAccountHomeAddress.setOnClickListener(this);
+        btnSaveAccount.setOnClickListener(this);
+
+        Paper.init(getActivity());
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mAuth.signOut();
+                Paper.book().destroy();
+                Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(loginIntent);
+
+                //Delete remember user and password (delete all key value saved after press logout (exit app))
+//                Paper.book().destroy();
+
+                //Logout
+
+//                Intent signIn = new Intent(getActivity(),MainActivity.class);
+//                signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+////                AccountKit.logOut();
+//                startActivity(signIn);
+
+            }
+        });
+
+        return view;
+    }
+
+    private void showHomeAddressDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle("CHANGE HOME ADDRESS");
+        alertDialog.setMessage("Please fill all information !");
+
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View layout_home = inflater.inflate(R.layout.home_address_layout,null);
+
+        final MaterialEditText edtHomeAddress = layout_home.findViewById(R.id.edtHomeAddress);
+
+        alertDialog.setView(layout_home);
+
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+
+
+                //For use SpotsDialog, please use AlertDialog from android.app, not from v7 like above AlertDialog
+                final android.app.AlertDialog waitingDialog = new SpotsDialog(getActivity());
+                waitingDialog.show();
+
+                //Update Name
+                Map<String,Object> update_home = new HashMap<>();
+                update_home.put("homeAddress",edtHomeAddress.getText().toString());
+
+                FirebaseDatabase.getInstance()
+                        .getReference("User")
+                        .child(Common.currentUser.getPhone())
+                        .updateChildren(update_home)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                //Dismiss dialog
+                                waitingDialog.dismiss();
+                                if (task.isSuccessful())
+                                    Toast.makeText(getActivity(), "Home Address was updated", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+            }
+        });
+
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    private void showChangePasswordDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle("UPDATE NAME");
+        alertDialog.setMessage("Please fill all information !");
+
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View layout_name = inflater.inflate(R.layout.update_name_layout,null);
+
+        final MaterialEditText edtName = layout_name.findViewById(R.id.edtName);
+
+        alertDialog.setView(layout_name);
+
+        //Button
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //For use SpotsDialog, please use AlertDialog from android.app, not from v7 like above AlertDialog
+                final android.app.AlertDialog waitingDialog = new SpotsDialog(getActivity());
+                waitingDialog.show();
+
+                //Update Name
+                Map<String,Object> update_name = new HashMap<>();
+                update_name.put("name",edtName.getText().toString());
+
+                FirebaseDatabase.getInstance()
+                        .getReference("User")
+                        .child(Common.currentUser.getPhone())
+                        .updateChildren(update_name)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                //Dismiss dialog
+                                waitingDialog.dismiss();
+                                if (task.isSuccessful())
+                                    Toast.makeText(getActivity(), "Name was updated", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+
+            }
+        });
+
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alertDialog.show();
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        //[Start retrieve data from child "user"]
+        mDatabase.child(mFirebaseUser.getPhoneNumber()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                User user = dataSnapshot.getValue(User.class);
+
+                edtAccountName.setText(user.getName());
+                edtAccountPhone.setText(user.getPhone());
+                edtAccountHomeAddress.setText(user.getHomeAddress());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+            //[End retrieve data from child "user"]
+        });
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        int i = view.getId();
+        if (i == R.id.btnSaveAccount){
+            saveAccount();
+        }
+
+
+    }
+
+    private void saveAccount() {
+
+        //[START SAVE/UPDATE DATA]
+        Map<String,Object> update_account = new HashMap<>();
+        update_account.put("name",edtAccountName.getText().toString());
+//        update_account.put("phone",edtAccountPhone.getText().toString());
+        update_account.put("homeAddress",edtAccountHomeAddress.getText().toString());
+
+        //SAVE TO DATABASE child "User"
+        FirebaseDatabase.getInstance()
+                .getReference("User")
+                .child(Common.currentUser.getPhone())
+                .updateChildren(update_account)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful())
+                            Toast.makeText(getActivity(), "Account was updated", Toast.LENGTH_SHORT).show();
+                        Intent homeIntent = new Intent(getActivity(), MainNewActivity.class);
+                        startActivity(homeIntent);
+
+                    }
+                });
+        //[END SAVE/UPDATE DATA]
+
+    }
+}
