@@ -17,10 +17,6 @@ public class ServiceViewHolder extends RecyclerView.ViewHolder implements View.O
 
     private ItemClickListener itemClickListener;
 
-    public void setItemClickListener(ItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
-    }
-
     public ServiceViewHolder(View itemView) {
         super(itemView);
 
@@ -32,6 +28,10 @@ public class ServiceViewHolder extends RecyclerView.ViewHolder implements View.O
         quick_cart = (Button) itemView.findViewById(R.id.btn_quick_cart);
 
         itemView.setOnClickListener(this);
+    }
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     @Override

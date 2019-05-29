@@ -35,8 +35,6 @@ public class PickupLocationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pickup_location);
 
-        //TODO tombol select from recent location
-
         btnSelectMap = findViewById(R.id.buttonSelectFromMap);
         btnRecentLocation = findViewById(R.id.buttonRecentLocation);
 
@@ -83,8 +81,6 @@ public class PickupLocationActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (ActivityCompat.checkSelfPermission(PickupLocationActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(PickupLocationActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
                     //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
                     //                                          int[] grantResults)

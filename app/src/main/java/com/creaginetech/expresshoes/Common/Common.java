@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.creaginetech.expresshoes.Model.Request;
 import com.creaginetech.expresshoes.Model.User;
 import com.creaginetech.expresshoes.Remote.APIService;
 import com.creaginetech.expresshoes.Remote.RetrofitClient;
@@ -13,6 +14,8 @@ public class Common {
     public static String topicName = "news";
 
     public static User currentUser;
+
+    public static Request currentRequest;
 
     public static String PHONE_TEXT = "userPhone";
 
@@ -25,6 +28,8 @@ public class Common {
     public static String shopLocationSelected = "";
 
     public static String serviceSelected = "";
+
+    public static String orderSelected = "";
 
     private static final String BASE_URL = "https://fcm.googleapis.com/";
 

@@ -1,5 +1,6 @@
 package com.creaginetech.expresshoes.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.creaginetech.expresshoes.Common.Common;
+import com.creaginetech.expresshoes.Interface.ItemClickListener;
 import com.creaginetech.expresshoes.Model.Request;
+import com.creaginetech.expresshoes.OrderDetailActivity;
 import com.creaginetech.expresshoes.R;
 import com.creaginetech.expresshoes.ViewHolder.OrderViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -56,18 +59,18 @@ public class OrderFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        loadOrder(Common.currentUser.getPhone());
+        loadOrder();
 
         return view;
 
     }
 
-    private void loadOrder(String phone) {
+    private void loadOrder() {
 
         //TODO CEK ORDER LIST, LALU BIKIN ORDER DETAIL
 
         //Create query by user
-        Query getOrderByUser = orderRef.orderByChild("phone").equalTo(phone);
+        Query getOrderByUser = orderRef.orderByChild("phone").equalTo(Common.currentUser.getPhone());
         //Create option with query
         FirebaseRecyclerOptions<Request> orderOptions = new FirebaseRecyclerOptions.Builder<Request>()
                 .setQuery(getOrderByUser,Request.class)
@@ -75,11 +78,13 @@ public class OrderFragment extends Fragment {
 
         adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(orderOptions) {
             @Override
-            protected void onBindViewHolder(@NonNull OrderViewHolder viewHolder, final int position, @NonNull Request model) {
+            protected void onBindViewHolder(@NonNull OrderViewHolder viewHolder, final int position, @NonNull final Request model) {
+
                 viewHolder.txtOrderId.setText(adapter.getRef(position).getKey());
                 viewHolder.txtOrderStatus.setText(Common.convertCodeToStatus(model.getStatus()));
                 viewHolder.txtOrderAddress.setText(model.getAddress());
                 viewHolder.txtOrderPhone.setText(model.getPhone());
+
                 viewHolder.btn_delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -91,6 +96,18 @@ public class OrderFragment extends Fragment {
 
                     }
                 });
+
+                viewHolder.setItemClickListener(new ItemClickListener() {
+                    @Override
+                    public void onClick(View view, int position, boolean isLongClick) {
+                        //Start new activity
+                        Intent serviceDetail = new Intent(getActivity(), OrderDetailActivity.class);
+                        Common.orderSelected = adapter.getRef(position).getKey(); // Send order Id to new activity
+                        Common.currentRequest = model;
+                        startActivity(serviceDetail);
+                    }
+                });
+
             }
 
             @Override

@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name=".SelectFromMapActivity"></activity>
+        <activity android:name=".OrderDetailActivity"></activity>
+        <activity android:name=".SelectFromMapActivity" />
         <activity android:name=".PickupLocationActivity" />
         <activity
             android:name=".LoginActivity"
@@ -92,9 +93,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".OjekActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ResultActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ServiceListActivity"
