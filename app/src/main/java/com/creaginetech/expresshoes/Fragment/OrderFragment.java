@@ -67,8 +67,6 @@ public class OrderFragment extends Fragment {
 
     private void loadOrder() {
 
-        //TODO CEK ORDER LIST, LALU BIKIN ORDER DETAIL
-
         //Create query by user
         Query getOrderByUser = orderRef.orderByChild("phone").equalTo(Common.currentUser.getPhone());
         //Create option with query

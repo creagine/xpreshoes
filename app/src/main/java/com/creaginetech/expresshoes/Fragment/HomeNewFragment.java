@@ -25,6 +25,10 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 //gantinya homefragment, udah pake model shop
 public class HomeNewFragment extends Fragment {
 
@@ -70,12 +74,20 @@ public class HomeNewFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_shop);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        if (Common.isConnectedToInternet(getActivity().getBaseContext())) //cp15 check internet connection
+        if (Common.isConnectedToInternet(getActivity().getBaseContext())) { //cp15 check internet connection
 
             //load list shop
             loadShop();
 
-        else {
+            //TODO pasang ini ke cat fixed lalu save to database
+            Date c = Calendar.getInstance().getTime();
+
+            SimpleDateFormat df = new SimpleDateFormat("dd MMM, HH:mm");
+            String formattedDate = df.format(c);
+
+            Toast.makeText(getActivity(), "Current time => " + formattedDate, Toast.LENGTH_LONG).show();
+
+        } else {
 
             //check internet connnection
             Toast.makeText(getActivity().getBaseContext(), "Please Check your connection", Toast.LENGTH_SHORT).show();

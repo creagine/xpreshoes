@@ -192,8 +192,6 @@ public class CartFixedActivity extends AppCompatActivity implements RecyclerItem
                     Toast.makeText(CartFixedActivity.this, "Thank you , Order Placed", Toast.LENGTH_SHORT).show();
                     finish();
 
-                    //TODO INTENT KE DETAIL ORDER
-
                     Intent intent = new Intent(CartFixedActivity.this, OrderDetailActivity.class);
                     Common.currentRequest = request;
                     startActivity(intent);

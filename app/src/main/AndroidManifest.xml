@@ -86,23 +86,11 @@
             android:name=".CartFixedActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MapsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".DirectionActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".OjekActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ServiceListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeFullscreen" />
         <activity
             android:name=".ServiceDetailActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".VerifyPhoneActivity"

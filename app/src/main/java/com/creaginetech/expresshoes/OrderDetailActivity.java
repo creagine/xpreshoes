@@ -20,6 +20,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
+        //TODO layout ganti pake detail_order_activity
 
         order_id = findViewById(R.id.order_id);
         order_phone = findViewById(R.id.order_phone);
@@ -41,7 +42,6 @@ public class OrderDetailActivity extends AppCompatActivity {
         order_total.setText(Common.currentRequest.getTotal());
         order_address.setText(Common.currentRequest.getAddress());
 
-        //TODO CEK INI< TERAPIN DI ORDER DETAIL CLIENT
         OrderDetailAdapter adapter = new OrderDetailAdapter(Common.currentRequest.getItems());
         adapter.notifyDataSetChanged();
         listFoods.setAdapter(adapter);
